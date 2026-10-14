@@ -8,11 +8,12 @@ let debutCourse = null;
 let carte = null;
 let ligneTrace = null;
 let pointsTrace = [];
-let marquer = null;
+let marqueur = null;
 let enPause = false;
 let pauseDebut = null;
 let filtreMuscle = null;
 let seanceEnCours = null;
+
 
 
 
@@ -255,11 +256,14 @@ function getLevel(xp){
 
 function markFullSession() {
     const hoy = todayStr();
+    if (!etat.history[hoy]) {
+        etat.history[hoy] = { presence: true };
+    }
     if (etat.history[hoy].full) {
         return;
     }
     etat.history[hoy].full = true;
-    etat.xp +=25;
+    etat.xp += 25;
     render();
     save();
 }
@@ -1184,22 +1188,25 @@ function traiterPosition(position){
     dernierePosition = { lat: lat, lon: lon }
     document.getElementById("course-distance").textContent = "Distance : " + distanceCourse.toFixed(2) + " km";
     pointsTrace.push([lat, lon]);
-        if (ligneTrace){
-            ligneTrace.setLatLngs(pointsTrace);
-        } else {
+
+    if (ligneTrace) {
+        ligneTrace.setLatLngs(pointsTrace);
+    } else {
         ligneTrace = L.polyline(pointsTrace, { color: "#5DBEBE", weight: 5 }).addTo(carte);
-                if (marqueur){
-            marqueur.setLatLng([lat, lon]);
-        } else {
-            marqueur = L.circleMarker([lat, lon], { radius: 8, color: "#ffffff", fillColor: "#5DBEBE", fillOpacity: 1 }).addTo(carte);
-        }
     }
-                if (pointsTrace.length === 1){
-            carte.setView([lat, lon], 16);
-        } else {
-            carte.panTo([lat, lon]);
-        }
+
+    if (marqueur) {
+        marqueur.setLatLng([lat, lon]);
+    } else {
+        marqueur = L.circleMarker([lat, lon], { radius: 8, color: "#ffffff", fillColor: "#5DBEBE", fillOpacity: 1 }).addTo(carte);
     }
+
+    if (pointsTrace.length === 1) {
+        carte.setView([lat, lon], 16);
+    } else {
+        carte.panTo([lat, lon]);
+    }
+}
 
     function renderNutrition(){
     const repasJour = etat.nutrition.repas.filter(function(r){ return r.date === todayStr(); });
