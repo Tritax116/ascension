@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+        <title>Ascension</title>
+        <link rel="stylesheet" href="style.css">
+        <link rel="manifest" href="manifest.json">
+        <meta name="theme-color" content="#8C8B5E">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+        </head>
+    <body>
+        <div id="lock-screen">
+            <p id="quote">citation ici</p>
+            <h1>pas de manette avant....</h1>
+            <button id="btn-presence">j'ai pas fait....</button>
+        </div>
+        <div id="dashboard" hidden>
+            <header id="app-header">
+                <span id="app-nom">Ascension</span>
+                <button id="btn-header-profil" class="btn-tertiaire" aria-label="Profil"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0 1 16 0v1"/></svg></button>
+            </header>
+            <nav id="nav-onglets">
+                <button data-page="accueil" class="onglet actif"><span class="onglet-icone"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20h14V9.5"/><path d="M9.5 20v-6h5v6"/></svg></span><span class="onglet-label">Accueil</span></button>
+                <button data-page="muscu" class="onglet"><span class="onglet-icone"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 9v6"/><path d="M5.5 7v10"/><path d="M5.5 12h13"/><path d="M18.5 7v10"/><path d="M21.5 9v6"/></svg></span><span class="onglet-label">Muscu</span></button>
+                <button data-page="course" class="onglet"><span class="onglet-icone"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg></span><span class="onglet-label">Course</span></button>
+                <button data-page="mobilite" class="onglet"><span class="onglet-icone"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2"/><path d="M12 7v6"/><path d="M8 20l4-7 4 7"/><path d="M7.5 11h9"/></svg></span><span class="onglet-label">Mobilité</span></button>
+                <button data-page="nutrition" class="onglet"><span class="onglet-icone"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3v7a3 3 0 0 0 6 0V3"/><path d="M8 3v18"/><path d="M17 3c-1.5 1-2 3-2 6s.5 4 2 5v7"/></svg></span><span class="onglet-label">Nutrition</span></button>
+            </nav>
+
+        <div id="page-accueil" class="page actif">
+            <button id="btn-toggle-vue" class="btn-tertiaire">Vue simple</button>
+            <p id="message-coach"></p>
+            <div id="jours-semaine"></div>
+            <div id="dashboard-compteurs">
+                <div class="compteur"><span class="compteur-valeur" id="dash-niveau"></span><span class="compteur-label">Niveau</span></div>
+                <div class="compteur"><span class="compteur-valeur" id="dash-seances"></span><span class="compteur-label">Séances</span></div>
+                <div class="compteur"><span class="compteur-valeur" id="dash-streak"></span><span class="compteur-label">Streak</span></div>
+            </div>
+            <h3>Progression par module</h3>
+            <div id="modules-progression"></div>
+            <h3>Calendrier par Module</h3>
+            <div id="calendrier-modules"></div>
+            <div id="avatar"></div>
+            <p id="avatar-next"></p>
+                <div id="avatar-niveau-fill"></div>
+            <span id="level-badge">niveau ici</span>
+            <span id="rang-score"></span>
+            <div id="xp-bar">
+                <div id="xp-fill"></div>
+                <p id="streak-count">Streak-count</p>
+            <button id="btn-full-session">séance complete</button>
+            </div>
+            <div id="quete-du-jour">
+                    <h3>Quête du jour</h3>
+                    <p id="quete-penalite"></p>
+                    <p id="quete-timer"></p>
+                    <p id="streak-alerte"></p>
+                    <ul id="quete-objectifs"></ul>
+                </div>
+            <div id="hydratation">
+                <h3>Hydratation</h3>
+                <p id="hydra-texte"></p>
+                    <div class="quete-barre">
+                <div id="hydra-fill" class="quete-fill"></div>
+                    </div>
+                    <button id="btn-hydra">+300 ml</button>
+                    <ul id="hydra-historique"></ul>
+            </div>
+            <p id="rappel-hydra"></p>
+        </div>
+
+        <div id="page-muscu" class="page">  
+                <div id="muscu-principal">
+                    <button id="btn-demarrer-seance" class="btn-primaire">Démarrer une séance</button>
+                    <div class="vues-muscle">
+    <button data-vue="front" class="vue-muscle on">Face</button>
+    <button data-vue="back" class="vue-muscle">Dos</button>
+</div>
+<div class="stage-muscle">
+    <svg viewBox="0 0 240 470" xmlns="http://www.w3.org/2000/svg" aria-label="Carte des muscles">
+        <g class="view on" id="vue-front">
+            <ellipse class="neutral" cx="120" cy="44" rx="20" ry="24"/>
+            <path class="neutral" d="M108 62 h24 v10 q0 8 -12 8 q-12 0 -12 -8 z"/>
+            <path class="muscle" data-muscle="abdos" aria-label="Abdos" d="M107 120 Q120 116 133 120 Q135 150 130 180 Q120 188 110 180 Q105 150 107 120 Z"/>
+            <path class="sep" d="M120 122 V182 M110 140 H130 M109 158 H131 M110 172 H130"/>
+            <g class="side">
+                <path class="muscle" data-muscle="trapezes" aria-label="Trapèzes" d="M114 66 Q100 68 84 84 Q94 90 102 88 Q109 77 116 75 Z"/>
+                <path class="muscle" data-muscle="epaules" aria-label="Épaules" d="M96 80 Q72 80 66 100 Q66 118 84 116 Q97 110 99 90 Z"/>
+                <path class="muscle" data-muscle="pectoraux" aria-label="Pectoraux" d="M117 84 Q98 84 92 102 Q92 116 111 120 Q117 116 117 104 Z"/>
+                <path class="muscle" data-muscle="obliques" aria-label="Obliques" d="M106 122 Q97 126 95 142 Q95 158 105 164 L109 162 L109 124 Z"/>
+                <path class="muscle" data-muscle="biceps" aria-label="Biceps" d="M82 116 Q66 124 64 152 Q72 160 84 153 Q88 132 90 118 Z"/>
+                <path class="muscle" data-muscle="avant-bras" aria-label="Avant-bras" d="M66 156 Q55 172 56 200 Q62 214 74 207 Q78 182 78 160 Z"/>
+                <ellipse class="neutral" cx="62" cy="224" rx="10" ry="13"/>
+                <path class="muscle" data-muscle="quadriceps" aria-label="Quadriceps" d="M115 186 Q94 190 90 222 Q88 254 99 292 Q109 300 115 282 Q119 240 117 200 Z"/>
+                <path class="sep" d="M104 200 Q100 250 106 288"/>
+                <path class="muscle" data-muscle="mollets" aria-label="Mollets" d="M101 300 Q95 322 99 356 Q105 372 114 365 Q118 334 118 306 Z"/>
+                <ellipse class="neutral" cx="108" cy="384" rx="12" ry="8"/>
+            </g>
+            <g class="side" transform="matrix(-1 0 0 1 240 0)">
+                <path class="muscle" data-muscle="trapezes" d="M114 66 Q100 68 84 84 Q94 90 102 88 Q109 77 116 75 Z"/>
+                <path class="muscle" data-muscle="epaules" d="M96 80 Q72 80 66 100 Q66 118 84 116 Q97 110 99 90 Z"/>
+                <path class="muscle" data-muscle="pectoraux" d="M117 84 Q98 84 92 102 Q92 116 111 120 Q117 116 117 104 Z"/>
+                <path class="muscle" data-muscle="obliques" d="M106 122 Q97 126 95 142 Q95 158 105 164 L109 162 L109 124 Z"/>
+                <path class="muscle" data-muscle="biceps" d="M82 116 Q66 124 64 152 Q72 160 84 153 Q88 132 90 118 Z"/>
+                <path class="muscle" data-muscle="avant-bras" d="M66 156 Q55 172 56 200 Q62 214 74 207 Q78 182 78 160 Z"/>
+                <ellipse class="neutral" cx="62" cy="224" rx="10" ry="13"/>
+                <path class="muscle" data-muscle="quadriceps" d="M115 186 Q94 190 90 222 Q88 254 99 292 Q109 300 115 282 Q119 240 117 200 Z"/>
+                <path class="sep" d="M104 200 Q100 250 106 288"/>
+                <path class="muscle" data-muscle="mollets" d="M101 300 Q95 322 99 356 Q105 372 114 365 Q118 334 118 306 Z"/>
+                <ellipse class="neutral" cx="108" cy="384" rx="12" ry="8"/>
+            </g>
+        </g>
+        <g class="view" id="vue-back">
+            <ellipse class="neutral" cx="120" cy="44" rx="20" ry="24"/>
+            <path class="neutral" d="M108 62 h24 v10 q0 8 -12 8 q-12 0 -12 -8 z"/>
+            <path class="muscle" data-muscle="lombaires" aria-label="Lombaires" d="M110 152 Q120 150 130 152 L128 200 Q120 206 112 200 Z"/>
+            <g class="side">
+                <path class="muscle" data-muscle="trapezes" d="M116 64 Q98 68 82 88 Q94 98 106 94 Q113 110 117 124 Z"/>
+                <path class="muscle" data-muscle="epaules" d="M96 82 Q72 82 66 100 Q66 118 84 116 Q97 110 99 92 Z"/>
+                <path class="muscle" data-muscle="triceps" d="M82 116 Q66 124 64 154 Q72 160 84 153 Q88 134 90 118 Z"/>
+                <path class="muscle" data-muscle="avant-bras" d="M66 158 Q55 174 56 202 Q62 216 74 209 Q78 184 78 162 Z"/>
+                <ellipse class="neutral" cx="62" cy="226" rx="10" ry="13"/>
+                <path class="muscle" data-muscle="dorsaux" d="M105 116 Q84 122 90 152 Q97 174 113 170 L115 118 Z"/>
+                <path class="muscle" data-muscle="fessiers" d="M115 202 Q95 202 93 226 Q95 246 113 246 L117 204 Z"/>
+                <path class="muscle" data-muscle="ischios" d="M113 250 Q94 254 92 286 Q96 296 102 296 Q113 296 117 262 L117 252 Z"/>
+                <path class="muscle" data-muscle="mollets" d="M101 302 Q93 322 97 350 Q101 370 112 364 Q118 336 118 308 Z"/>
+                <ellipse class="neutral" cx="108" cy="384" rx="12" ry="8"/>
+            </g>
+            <g class="side" transform="matrix(-1 0 0 1 240 0)">
+                <path class="muscle" data-muscle="trapezes" d="M116 64 Q98 68 82 88 Q94 98 106 94 Q113 110 117 124 Z"/>
+                <path class="muscle" data-muscle="epaules" d="M96 82 Q72 82 66 100 Q66 118 84 116 Q97 110 99 92 Z"/>
+                <path class="muscle" data-muscle="triceps" d="M82 116 Q66 124 64 154 Q72 160 84 153 Q88 134 90 118 Z"/>
+                <path class="muscle" data-muscle="avant-bras" d="M66 158 Q55 174 56 202 Q62 216 74 209 Q78 184 78 162 Z"/>
+                <ellipse class="neutral" cx="62" cy="226" rx="10" ry="13"/>
+                <path class="muscle" data-muscle="dorsaux" d="M105 116 Q84 122 90 152 Q97 174 113 170 L115 118 Z"/>
+                <path class="muscle" data-muscle="fessiers" d="M115 202 Q95 202 93 226 Q95 246 113 246 L117 204 Z"/>
+                <path class="muscle" data-muscle="ischios" d="M113 250 Q94 254 92 286 Q96 296 102 296 Q113 296 117 262 L117 252 Z"/>
+                <path class="muscle" data-muscle="mollets" d="M101 302 Q93 322 97 350 Q101 370 112 364 Q118 336 118 308 Z"/>
+                <ellipse class="neutaral" cx="108" cy="384" rx="12" ry="8"/>
+            </g>
+        </g>
+    </svg>
+</div>
+<div id="legende-muscles">
+    <span><i style="background:#3A3B2E"></i> Non travaillé</span>
+    <span><i style="background:#A67C52"></i> Bronze</span>
+    <span><i style="background:#B0B0B0"></i> Argent</span>
+    <span><i style="background:#F2C744"></i> Or</span>
+    <span><i style="background:#5DBEBE"></i> Platine</span>
+    <span><i style="background:#A78BFA"></i> Diamant</span>
+</div>
+            <h2>Muscu</h2>
+            <ul id="liste-exercice"></ul>
+                </div>
+                <div id="detail-muscle" hidden>
+                    <button id="btn-retour-muscle">← Retour</button>
+                    <h2 id="detail-nom">Muscle</h2>
+                    <p id="detail-rang">Rang</p>
+                    <ul id="detail-exos"></ul>
+                </div>
+                <h3>Séances terminées</h3>
+                <ul id="seances-historique"></ul>
+        </div>
+        
+            <div id="page-course" class="page">
+                <h2>Course</h2>
+                <div class="course-stats">
+                    <p id="course-etat">Prêt</p>
+                    <p id="course-distance">Distance: 0.00km</p>
+                    <p id="course-temps">Temps: 00:00</p>
+                    <p id="course-allure">Allure: --/km</p>
+                </div>
+                <div id="carte-course"></div>
+            <button id="btn-start-course" class="btn-primaire">Démarrer</button>
+            <button id="btn-pause-course" class="btn-secondaire">Mettre en pause</button>
+            <button id="btn-stop-course" class="btn-secondaire">Terminer</button>
+            <ul id="liste-courses"></ul>
+            </div>
+                        <div id="page-nutrition" class="page">
+                <h2>Nutrition</h2>
+                <div class="nutri-resume">
+                    <p id="nutri-calories"></p>
+                    <div class="quete-barre">
+                        <div id="nutri-fill" class="quete-fill"></div>
+                    </div>
+                    <p id="nutri-macros"></p>
+                </div>
+                <div class="nutri-recherche">
+                    <input id="nutri-input" type="text" placeholder="Chercher un aliment...">
+                    <button id="btn-nutri-chercher" class="btn-primaire">Chercher</button>
+                </div>
+                <ul id="nutri-resultats"></ul>
+                <h3>Repas d'aujourd'hui</h3>
+                <ul id="nutri-repas"></ul>
+            </div>
+            <div id="page-mobilite" class="page">
+                <h2>Mobilité</h2>
+                <div class="test-mobilite">
+    <span>Souplesse</span>
+    <div class="selecteur" id="sel-souplesse">
+        <button class="btn-note" data-note="1">1</button>
+        <button class="btn-note" data-note="2">2</button>
+        <button class="btn-note" data-note="3">3</button>
+        <button class="btn-note" data-note="4">4</button>
+        <button class="btn-note" data-note="5">5</button>
+    </div>
+</div>
+<div class="test-mobilite">
+    <span>Squat</span>
+    <div class="selecteur" id="sel-squat">
+        <button class="btn-note" data-note="1">1</button>
+        <button class="btn-note" data-note="2">2</button>
+        <button class="btn-note" data-note="3">3</button>
+        <button class="btn-note" data-note="4">4</button>
+        <button class="btn-note" data-note="5">5</button>
+    </div>
+</div>
+<div class="test-mobilite">
+    <span>Épaules</span>
+    <div class="selecteur" id="sel-epaules">
+        <button class="btn-note" data-note="1">1</button>
+        <button class="btn-note" data-note="2">2</button>
+        <button class="btn-note" data-note="3">3</button>
+        <button class="btn-note" data-note="4">4</button>
+        <button class="btn-note" data-note="5">5</button>
+    </div>
+</div>
+                <button id="btn-mesurer-mobilite">Mesurer</button>
+                <p id="mob-score"></p>
+                <h3>Évolution du score /100</h3>
+                <div id="mob-graphique"></div>
+                <ul id="mob-historique"></ul>
+                <h3>Routines</h3>
+                <button id="btn-echauffement" class="btn-secondaire">Échauffement</button>
+                <button id="btn-etirement" class="btn-secondaire">Étirements</button>
+                <ul id="routine-liste"></ul>
+            </div>
+                <div id="page-profil" class="page">
+                    <h3>Badges</h3>
+                    <ul id="liste-badges"></ul>
+                    <button id="btn-retour-profil" class="btn-tertiaire">← Retour</button>
+                    <h2>Profil / Réglages</h2>
+                    <div id="fiche-perso">
+                        <label>Poids (kg) : <input type="number" id="input-poids-perso"></label>
+                    </div>
+                    <p id="fiche-classe"></p>
+                    <p id="fiche-titre"></p>
+                </div>
+                <div id="page-seance" class="page">
+    <div id="seance-entete">
+        <span id="seance-duree">00:00</span>
+        <span id="seance-volume">0 kg</span>
+        <span id="seance-series">0 séries</span>
+    </div>
+        <select id="seance-muscle">
+        <option value="trapezes">Trapèzes</option>
+        <option value="epaules">Épaules</option>
+        <option value="pectoraux">Pectoraux</option>
+        <option value="biceps">Biceps</option>
+        <option value="triceps">Triceps</option>
+        <option value="avant-bras">Avant-bras</option>
+        <option value="abdos">Abdos</option>
+        <option value="obliques">Obliques</option>
+        <option value="dorsaux">Dorsaux</option>
+        <option value="lombaires">Lombaires</option>
+        <option value="fessiers">Fessiers</option>
+        <option value="quadriceps">Quadriceps</option>
+        <option value="ischios">Ischio-jambiers</option>
+        <option value="mollets">Mollets</option>
+    </select>
+    <input type="text" id="seance-exo" placeholder="Exercice">
+<input type="number" id="seance-poids" placeholder="Poids (kg)">
+<input type="number" id="seance-reps" placeholder="Répétitions">
+    <button id="btn-ajouter-exo" class="btn-secondaire">+ Ajouter un exercice</button>
+    <ul id="seance-liste"></ul>
+    <button id="btn-terminer-seance" class="btn-primaire">Terminer</button>
+    <button id="btn-abandonner-seance" class="btn-tertiaire">Abandonner</button>
+</div>
+            </div>      
+        <script src="app.js"></script>
+        <div id="celebration" hidden>
+            <div id="celebration-contenu">
+                <p id="celebration-message"></p>
+            </div>
+        </div>
+    </body>
+</html>
