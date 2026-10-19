@@ -59,10 +59,12 @@
             </div>
         </div>
 
-        <div id="page-muscu" class="page">  
-                <div id="muscu-principal">
-                    <button id="btn-demarrer-seance" class="btn-primaire">Démarrer une séance</button>
-                    <div class="vues-muscle">
+        <div id="page-muscu" class="page">
+            <h2>Muscu</h2>
+
+            <button id="btn-demarrer-seance" class="btn-primaire">Démarrer une séance</button>
+
+<div class="vues-muscle">
     <button data-vue="front" class="vue-muscle on">Face</button>
     <button data-vue="back" class="vue-muscle">Dos</button>
 </div>
@@ -139,20 +141,25 @@
     <span><i style="background:#5DBEBE"></i> Platine</span>
     <span><i style="background:#A78BFA"></i> Diamant</span>
 </div>
-            <h2>Muscu</h2>
-            <ul id="liste-exercice"></ul>
-                </div>
-                <div id="detail-muscle" hidden>
-                    <button id="btn-retour-muscle">← Retour</button>
-                    <h2 id="detail-nom">Muscle</h2>
-                    <p id="detail-rang">Rang</p>
-                    <ul id="detail-exos"></ul>
-                </div>
-                <h3>Séances terminées</h3>
-                <ul id="seances-historique"></ul>
+            
+            <div id="bloc-filtre-muscle" hidden>
+                <h3 id="filtre-titre">Exercices du muscle</h3>
+                <button id="btn-effacer-filtre" class="btn-tertiaire">Tout afficher</button>
+                <ul id="liste-exercice"></ul>
+            </div>
+
+            <h3>Séances terminées</h3>
+            <ul id="seances-historique"></ul>
+
+            <div id="detail-muscle" hidden>
+                <button id="btn-retour-muscle">← Retour</button>
+                <h2 id="detail-nom">Muscle</h2>
+                <p id="detail-rang">Rang</p>
+                <ul id="detail-exos"></ul>
+            </div>
         </div>
-        
-            <div id="page-course" class="page">
+
+        <div id="page-course" class="page">
                 <h2>Course</h2>
                 <div class="course-stats">
                     <p id="course-etat">Prêt</p>
@@ -167,36 +174,43 @@
             <ul id="liste-courses"></ul>
             </div>
                         <div id="page-nutrition" class="page">
-                <h2>Nutrition</h2>
-                <div class="nutri-resume">
-                    <p id="nutri-calories"></p>
-                    <div class="quete-barre">
-                        <div id="nutri-fill" class="quete-fill"></div>
-                    </div>
-                    <p id="nutri-macros"></p>
-                </div>
-                <div class="nutri-recherche">
-                    <input id="nutri-input" type="text" placeholder="Chercher un aliment...">
-                    <button id="btn-nutri-chercher" class="btn-primaire">Chercher</button>
-                </div>
-                <ul id="nutri-resultats"></ul>
-                <h3>Repas d'aujourd'hui</h3>
-                <ul id="nutri-repas"></ul>
+            <h2>Nutrition</h2>
 
-                <div id="hydratation">
-                    <h3>Hydratation</h3>
-                    <p id="hydra-texte"></p>
-                    <div class="quete-barre">
-                        <div id="hydra-fill" class="quete-fill"></div>
-                    </div>
-                    <button id="btn-hydra">+300 ml</button>
-                    <ul id="hydra-historique"></ul>
+            <div class="nutri-resume">
+                <p id="nutri-calories"></p>
+                <div class="quete-barre">
+                    <div id="nutri-fill" class="quete-fill"></div>
                 </div>
+                <p id="nutri-macros"></p>
+            </div>
+
+            <h3>Repas d'aujourd'hui</h3>
+            <ul id="nutri-repas"></ul>
+
+            <div id="hydratation">
+                <h3>Hydratation</h3>
+                <p id="hydra-texte"></p>
+                <div class="quete-barre">
+                    <div id="hydra-fill" class="quete-fill"></div>
+                </div>
+                <button id="btn-hydra">+300 ml</button>
+                <ul id="hydra-historique"></ul>
                 <p id="rappel-hydra"></p>
             </div>
-            <div id="page-mobilite" class="page">
-                <h2>Mobilité</h2>
-                <div class="test-mobilite">
+
+            <h3>Ajouter un aliment</h3>
+            <div class="nutri-recherche">
+                <input id="nutri-input" type="text" placeholder="Chercher un aliment...">
+                <button id="btn-nutri-chercher" class="btn-primaire">Chercher</button>
+            </div>
+            <ul id="nutri-resultats"></ul>
+        </div>
+
+        <div id="page-mobilite" class="page">
+            <h2>Mobilité</h2>
+
+            <h3>Test du jour</h3>
+<div class="test-mobilite">
     <span>Souplesse</span>
     <div class="selecteur" id="sel-souplesse">
         <button class="btn-note" data-note="1">1</button>
@@ -226,17 +240,18 @@
         <button class="btn-note" data-note="5">5</button>
     </div>
 </div>
-                <button id="btn-mesurer-mobilite">Mesurer</button>
-                <p id="mob-score"></p>
-                <h3>Évolution du score /100</h3>
-                <div id="mob-graphique"></div>
-                <ul id="mob-historique"></ul>
-                <h3>Routines</h3>
-                <button id="btn-echauffement" class="btn-secondaire">Échauffement</button>
-                <button id="btn-etirement" class="btn-secondaire">Étirements</button>
-                <ul id="routine-liste"></ul>
-            </div>
-                <div id="page-profil" class="page">
+                            <button id="btn-mesurer-mobilite" class="btn-primaire">Mesurer</button>
+            <p id="mob-score"></p>
+
+            <h3>Évolution du score /100</h3>
+            <div id="mob-graphique"></div>
+
+            <h3>Routines</h3>
+            <button id="btn-echauffement" class="btn-secondaire">Échauffement</button>
+            <button id="btn-etirement" class="btn-secondaire">Étirements</button>
+            <ul id="routine-liste"></ul>
+        </div>
+        <div id="page-profil" class="page">
                     <button id="btn-retour-profil" class="btn-tertiaire">← Retour</button>
                     <h2>Profil / Progression</h2>
 

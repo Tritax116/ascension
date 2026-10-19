@@ -297,6 +297,10 @@ save();
 render();
 
 function renderMuscu() {
+    document.getElementById("bloc-filtre-muscle").hidden = !filtreMuscle;
+    if (filtreMuscle) {
+        document.getElementById("filtre-titre").textContent = "Exercices — " + filtreMuscle;
+    }
     const liste = document.getElementById("liste-exercice");
     liste.innerHTML = "";
     const parDate = {};
@@ -654,6 +658,11 @@ for (let i = 0; i < zonesMuscle.length; i++) {
     });
 }
 
+document.getElementById("btn-effacer-filtre").addEventListener("click", function () {
+    filtreMuscle = null;
+    renderMuscu();
+});
+
 document.getElementById("btn-retour-muscle").addEventListener("click", function () {
     document.getElementById("detail-muscle").hidden = true;
 });
@@ -827,15 +836,6 @@ function renderMobilite() {
     }
     const dernier = etat.mobilite[etat.mobilite.length - 1];
     document.getElementById("mob-score").textContent = "Score de mobilité : " + dernier.score + " / 100";
-    const liste = document.getElementById("mob-historique");
-    liste.innerHTML = "";
-    for (let i = 0; i < etat.mobilite.length; i++) {
-        const m = etat.mobilite[i];
-        const ligne = document.createElement("li");
-        ligne.textContent = m.date + " - " + m.score + " / 100";
-        liste.appendChild(ligne);
-    }
-
     const graph = document.getElementById("mob-graphique");
     graph.innerHTML = "";
     for (let i = 0; i < etat.mobilite.length; i++) {
