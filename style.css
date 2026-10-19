@@ -45,14 +45,27 @@
     --texte-label: 12px;
     --rayon: 14px;
     --ombre: 0 4px 16px rgba(0, 0, 0, 0.45);
+
+    /* Deux familles : Morhefa est une police d'affichage, illisible en petit.
+       Elle habille les titres et les chiffres ; le texte courant passe en police systeme. */
+    --police-titre: "Morhefa", system-ui, sans-serif;
+    --police-texte: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+
+    /* Verre : une seule definition, reutilisee partout */
+    --verre-fond: rgba(27, 28, 19, 0.72);
+    --verre-bordure: rgba(180, 179, 137, 0.18);
+    --verre-flou: blur(18px) saturate(140%);
 }
 
 body{
     background-color: var(--bg);
     color: var(--texte);
-    font-family: "Morhefa", system-ui, sans-serif;
+    font-family: var(--police-texte);
+    font-size: var(--texte-corps);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
     margin: 0;
-    padding: 64px var(--espace-lg) calc(80px + env(safe-area-inset-bottom));
+    padding: 68px var(--espace-lg) calc(104px + env(safe-area-inset-bottom));
 }
 body::before{
     content: "";
@@ -156,7 +169,7 @@ h1{
 }
 .onglet.actif {
     color: var(--accent);
-    background-color: transparent;
+    background: rgba(242, 199, 68, 0.10);
 }
 
 .stage-muscle{
@@ -305,12 +318,18 @@ h1{
 
 #nav-onglets {
     position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    bottom: calc(var(--espace-md) + env(safe-area-inset-bottom));
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(440px, calc(100% - 2 * var(--espace-lg)));
     display: flex;
-    background-color: var(--surface);
-    border-top: 1px solid var(--surface-2);
+    padding: var(--espace-xs);
+    border-radius: 999px;
+    background: var(--verre-fond);
+    backdrop-filter: var(--verre-flou);
+    -webkit-backdrop-filter: var(--verre-flou);
+    border: 1px solid var(--verre-bordure);
+    box-shadow: 0 10px 34px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.06);
     z-index: 100;
 }
 .onglet {
@@ -323,8 +342,10 @@ h1{
     align-items: center;
     gap: var(--espace-xs);
     padding: var(--espace-sm) 0;
-    min-height: 56px;
-    font-size: var(--texte-label);
+    min-height: 52px;
+    border-radius: 999px;
+    font-size: 11px;
+    letter-spacing: 0.02em;
     cursor: pointer;
 }
 .onglet-icone {
@@ -604,8 +625,10 @@ h1{
     justify-content: space-between;
     align-items: center;
     padding: var(--espace-sm) var(--espace-lg);
-    background-color: var(--surface);
-    border-bottom: 1px solid var(--surface-2);
+    background: rgba(27, 28, 19, 0.65);
+    backdrop-filter: var(--verre-flou);
+    -webkit-backdrop-filter: var(--verre-flou);
+    border-bottom: 1px solid rgba(180, 179, 137, 0.12);
     z-index: 100;
 }
 #app-nom {
@@ -711,4 +734,204 @@ h1{
 #hydra-texte,
 #nutri-calories {
     font-variant-numeric: tabular-nums;
+}
+/* ===========================================================
+   Hierarchie typographique
+   Morhefa habille ce qui doit frapper ; le reste reste lisible.
+   =========================================================== */
+
+#app-nom,
+#level-badge,
+#celebration-message,
+h1, h2, h3,
+.compteur-valeur,
+#seance-duree,
+#seance-volume,
+#seance-series,
+#quete-timer,
+#mob-score,
+#nutri-calories,
+#hydra-texte,
+.course-stats p,
+#detail-nom {
+    font-family: var(--police-titre);
+}
+
+h1, h2, h3 {
+    letter-spacing: 0.01em;
+    line-height: 1.2;
+}
+h2 {
+    font-size: var(--texte-h1);
+    margin-bottom: var(--espace-md);
+}
+h3 {
+    font-size: var(--texte-h3);
+    color: var(--texte-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: var(--espace-2xl);
+    margin-bottom: var(--espace-md);
+}
+
+/* Les etiquettes minuscules repassent en police systeme : c'est la
+   ou Morhefa devenait penible a lire. */
+.compteur-label,
+.onglet-label,
+.cal-label,
+#legende-muscles,
+.jour-chip,
+#avatar-next,
+#rang-score {
+    font-family: var(--police-texte);
+}
+
+/* ===========================================================
+   Cartes : un seul traitement coherent
+   =========================================================== */
+
+.compteur,
+.course-stats,
+#quete-du-jour,
+#hydratation,
+.nutri-resume {
+    border: 1px solid rgba(180, 179, 137, 0.10);
+}
+
+#quete-du-jour,
+#hydratation,
+.nutri-resume {
+    background: linear-gradient(160deg, #1F2016, var(--surface));
+    border-radius: var(--rayon);
+    padding: var(--espace-lg);
+    box-shadow: var(--ombre);
+}
+
+#quete-du-jour h3,
+#hydratation h3 {
+    margin-top: 0;
+}
+
+/* ===========================================================
+   Barres de progression : plus fines, arrondies, avec une lueur
+   =========================================================== */
+
+.module-barre,
+.quete-barre {
+    height: 8px;
+    border-radius: 999px;
+    background-color: rgba(44, 45, 34, 0.9);
+}
+
+.module-fill,
+.quete-fill,
+#hydra-fill {
+    border-radius: 999px;
+    box-shadow: 0 0 10px rgba(140, 139, 94, 0.45);
+}
+
+.module-fill {
+    background: linear-gradient(90deg, var(--kaki-fonce), var(--kaki-clair)) !important;
+    transition: width 0.4s ease-out;
+}
+
+/* ===========================================================
+   Bulles et modales en verre
+   =========================================================== */
+
+#detail-muscle {
+    background: var(--verre-fond);
+    backdrop-filter: var(--verre-flou);
+    -webkit-backdrop-filter: var(--verre-flou);
+    border: 1px solid var(--verre-bordure);
+    box-shadow: 0 12px 34px rgba(0, 0, 0, 0.6);
+}
+
+#celebration {
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+}
+
+#celebration-contenu {
+    background: var(--verre-fond);
+    backdrop-filter: var(--verre-flou);
+    -webkit-backdrop-filter: var(--verre-flou);
+    border: 1px solid rgba(242, 199, 68, 0.45);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+}
+
+/* ===========================================================
+   Details
+   =========================================================== */
+
+#app-nom {
+    letter-spacing: 0.06em;
+}
+
+.compteur-valeur {
+    font-size: 26px;
+    line-height: 1.1;
+}
+.compteur-label {
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-size: 10px;
+}
+
+/* L'avatar glissait sous la barre de navigation */
+#avatar {
+    max-width: 150px;
+    margin: var(--espace-lg) auto 0;
+}
+#avatar img {
+    image-rendering: pixelated;
+}
+
+#message-coach {
+    font-family: var(--police-texte);
+    font-style: normal;
+    color: var(--kaki-clair);
+    border-left: 2px solid var(--kaki);
+    padding-left: var(--espace-md);
+}
+
+.jour-chip {
+    letter-spacing: 0.02em;
+}
+.jour-chip.actif {
+    box-shadow: 0 0 14px rgba(140, 139, 94, 0.5);
+}
+
+ul#liste-exercice,
+ul#seances-historique,
+ul#liste-courses,
+ul#mob-historique,
+ul#liste-badges,
+ul#nutri-repas,
+ul#nutri-resultats,
+ul#routine-liste,
+ul#seance-liste {
+    list-style: none;
+    padding: 0;
+}
+
+#liste-exercice li,
+#seances-historique li,
+#liste-courses li,
+#mob-historique li,
+#liste-badges li,
+#nutri-repas li,
+#nutri-resultats li,
+#routine-liste li,
+#seance-liste li {
+    padding: var(--espace-sm) var(--espace-md);
+    border-bottom: 1px solid rgba(180, 179, 137, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--espace-sm);
+}
+
+#nutri-resultats li:active {
+    background: rgba(140, 139, 94, 0.12);
 }
