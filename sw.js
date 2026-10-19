@@ -9,6 +9,7 @@ const FICHIERS = [
     "fonts/morhefa-500.woff2",
     "fonts/morhefa-700.woff2"
 ];
+
 self.addEventListener("install", function(e){
     self.skipWaiting();
     e.waitUntil(caches.open(CACHE).then(function(c){ return c.addAll(FICHIERS); }));

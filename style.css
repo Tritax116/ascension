@@ -664,14 +664,8 @@ h1{
     color: var(--bg);
 }
 
-.mode-liste #avatar,
-.mode-liste #avatar-next,
-.mode-liste #level-badge,
-.mode-liste #rang-score,
-.mode-liste #xp-bar,
-.mode-liste #dashboard-compteurs,
-.mode-liste #calendar,
-.mode-liste #jours-semaine,
+.mode-liste #hero,
+.mode-liste #streak-semaine,
 .mode-liste #message-coach {
     display: none;
 }
@@ -997,53 +991,73 @@ ul#seance-liste {
     color: var(--texte-dim);
 }
 /* ===========================================================
-   Carte de streak : 7 pastilles L M M J V S D
+   Hero : rang + avatar + XP en UN seul bloc
+   (remplace level-badge / rang-score / xp-bar / compteurs
+    qui etaient quatre blocs empiles pour la meme info)
    =========================================================== */
 
-#streak-semaine {
+#hero {
     display: flex;
-    gap: var(--espace-xs);
-    padding: var(--espace-md) var(--espace-sm);
+    align-items: center;
+    gap: var(--espace-lg);
+    padding: var(--espace-lg);
     margin-bottom: var(--espace-lg);
     border-radius: var(--rayon);
     background: linear-gradient(160deg, #1F2016, var(--surface));
     border: 1px solid rgba(180, 179, 137, 0.10);
+    box-shadow: var(--ombre);
 }
 
-.streak-jour {
+#hero #avatar {
+    flex: 0 0 96px;
+    max-width: 96px;
+    margin: 0;
+}
+
+#hero-infos {
     flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--espace-xs);
+    min-width: 0;
 }
 
-.streak-point {
-    width: 26px;
-    height: 26px;
-    border-radius: 50%;
-    border: 1.5px solid rgba(180, 179, 137, 0.25);
-    transition: background 0.3s ease, box-shadow 0.3s ease;
+#hero #level-badge {
+    display: block;
+    font-size: 30px;
+    font-weight: 800;
+    letter-spacing: 0.01em;
+    margin-bottom: var(--espace-sm);
 }
 
-.streak-point.rempli {
-    background: linear-gradient(180deg, var(--kaki-clair), var(--kaki));
-    border-color: transparent;
-    box-shadow: 0 0 10px rgba(180, 179, 137, 0.55);
+#hero #xp-bar {
+    width: 100%;
+    height: 8px;
+    border-radius: 999px;
+    background-color: rgba(44, 45, 34, 0.9);
+    overflow: hidden;
+    margin: 0 0 var(--espace-sm);
 }
 
-.streak-lettre {
-    font-size: 10px;
-    letter-spacing: 0.06em;
+#hero #xp-fill {
+    height: 100%;
+    border-radius: 999px;
+    box-shadow: 0 0 10px rgba(180, 179, 137, 0.45);
+}
+
+#hero #avatar-next {
+    margin: 0;
+    font-size: var(--texte-label);
     color: var(--texte-dim);
 }
 
-.streak-jour.aujourdhui .streak-point {
-    border-color: var(--accent);
-    border-width: 2px;
+/* Les deux actions du header cote a cote */
+#header-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--espace-sm);
 }
 
-.streak-jour.aujourdhui .streak-lettre {
-    color: var(--accent);
-    font-weight: 700;
+/* Le bouton principal de l'accueil */
+#page-accueil #btn-full-session {
+    display: block;
+    width: 100%;
+    margin-bottom: var(--espace-lg);
 }

@@ -212,19 +212,13 @@ function render() {
     const dejaFait = etat.history[hoy] && etat.history[hoy].presence;
     document.getElementById("lock-screen").hidden = dejaFait;
     document.getElementById("dashboard").hidden = !dejaFait;
-    let mot = "jours";
-    if (etat.streak === 1) {
-        mot = "jour"
-    }
     const prochain = xpProchainStade();
     if (prochain) {
         document.getElementById("avatar-next").textContent = "Encore : " + prochain.xp + " XP avant " + prochain.nom;
     } else {
         document.getElementById("avatar-next").textContent = "Stade maximal atteint";
     }
-    document.getElementById("streak-count").textContent = "Streak : " + etat.streak + " " + mot;
     document.getElementById("level-badge").textContent = rang.nom + " " + rang.division;
-    document.getElementById("rang-score").textContent = Math.round(rang.pourcentage) + " / 100";
     document.getElementById("level-badge").style.color = rang.couleur;
     document.getElementById("quote").textContent = citationsAleatoire();
     document.getElementById("xp-fill").style.width = rang.pourcentage + "%";
@@ -237,11 +231,9 @@ function render() {
     renderQuete();
     renderHydratation();
     colorerMuscles();
-    renderDashboard();
     renderMobilite();
     verifierBadges();
     renderBadges();
-    renderJours();
     renderSeance();
     renderSeances();
     rappelHydratation();
@@ -818,19 +810,6 @@ function setPoids() {
     render();
 }
 
-function renderDashboard() {
-    const rang = getRang();
-    document.getElementById("dash-niveau").textContent = Math.floor(etat.xp / 100) + 1;
-    let seances = etat.course.length;
-    for (const jour in etat.history) {
-        if (etat.history[jour].full) {
-            seances++;
-        }
-    }
-    document.getElementById("dash-seances").textContent = seances;
-    document.getElementById("dash-streak").textContent = etat.streak;
-}
-
 function mesurerMobilite() {
     const s = noteSelectionnee("sel-souplesse");
     const sq = noteSelectionnee("sel-squat");
@@ -993,24 +972,6 @@ function renderStreak() {
         conteneur.appendChild(jour);
     }
 }
-function renderJours() {
-    const conteneur = document.getElementById("jours-semaine");
-    conteneur.innerHTML = "";
-    const jours = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
-    const auj = new Date();
-    for (let i = -3; i <= 3; i++) {
-        const d = new Date();
-        d.setDate(auj.getDate() + i);
-        const jour = document.createElement("div");
-        jour.className = "jour-chip";
-        if (i === 0) {
-            jour.className = "jour-chip actif";
-        }
-        jour.textContent = jours[d.getDay()] + " " + d.getDate();
-        conteneur.appendChild(jour);
-    }
-}
-
 function demarrerSeance() {
     seanceEnCours = { debut: Date.now(), series: [] };
     changerPage("seance");

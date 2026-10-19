@@ -19,7 +19,10 @@
         <div id="dashboard" hidden>
             <header id="app-header">
                 <span id="app-nom">Ascension</span>
+                <div id="header-actions">
+                <button id="btn-toggle-vue" class="btn-tertiaire">Vue simple</button>
                 <button id="btn-header-profil" class="btn-tertiaire" aria-label="Profil"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0 1 16 0v1"/></svg></button>
+                </div>
             </header>
             <nav id="nav-onglets">
                 <button data-page="accueil" class="onglet actif"><span class="onglet-icone"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20h14V9.5"/><path d="M9.5 20v-6h5v6"/></svg></span><span class="onglet-label">Accueil</span></button>
@@ -30,46 +33,30 @@
             </nav>
 
         <div id="page-accueil" class="page actif">
-            <button id="btn-toggle-vue" class="btn-tertiaire">Vue simple</button>
             <p id="message-coach"></p>
-            <div id="jours-semaine"></div>
-            <div id="dashboard-compteurs">
-                <div class="compteur"><span class="compteur-valeur" id="dash-niveau"></span><span class="compteur-label">Niveau</span></div>
-                <div class="compteur"><span class="compteur-valeur" id="dash-seances"></span><span class="compteur-label">Séances</span></div>
-                <div class="compteur"><span class="compteur-valeur" id="dash-streak"></span><span class="compteur-label">Streak</span></div>
-            </div>
-            <div id="streak-semaine"></div>
-            <h3>Progression par module</h3>
-            <div id="modules-progression"></div>
-            <h3>Calendrier par Module</h3>
-            <div id="calendrier-modules"></div>
-            <div id="avatar"></div>
-            <p id="avatar-next"></p>
-                <div id="avatar-niveau-fill"></div>
-            <span id="level-badge">niveau ici</span>
-            <span id="rang-score"></span>
-            <div id="xp-bar">
-                <div id="xp-fill"></div>
-                <p id="streak-count">Streak-count</p>
-            <button id="btn-full-session">séance complete</button>
-            </div>
-            <div id="quete-du-jour">
-                    <h3>Quête du jour</h3>
-                    <p id="quete-penalite"></p>
-                    <p id="quete-timer"></p>
-                    <p id="streak-alerte"></p>
-                    <ul id="quete-objectifs"></ul>
-                </div>
-            <div id="hydratation">
-                <h3>Hydratation</h3>
-                <p id="hydra-texte"></p>
-                    <div class="quete-barre">
-                <div id="hydra-fill" class="quete-fill"></div>
+
+            <div id="hero">
+                <div id="avatar"></div>
+                <div id="hero-infos">
+                    <span id="level-badge">niveau ici</span>
+                    <div id="xp-bar">
+                        <div id="xp-fill"></div>
                     </div>
-                    <button id="btn-hydra">+300 ml</button>
-                    <ul id="hydra-historique"></ul>
+                    <p id="avatar-next"></p>
+                </div>
             </div>
-            <p id="rappel-hydra"></p>
+
+            <div id="streak-semaine"></div>
+
+            <button id="btn-full-session" class="btn-primaire">Séance complète</button>
+
+            <div id="quete-du-jour">
+                <h3>Quête du jour</h3>
+                <p id="quete-penalite"></p>
+                <p id="quete-timer"></p>
+                <p id="streak-alerte"></p>
+                <ul id="quete-objectifs"></ul>
+            </div>
         </div>
 
         <div id="page-muscu" class="page">  
@@ -195,6 +182,17 @@
                 <ul id="nutri-resultats"></ul>
                 <h3>Repas d'aujourd'hui</h3>
                 <ul id="nutri-repas"></ul>
+
+                <div id="hydratation">
+                    <h3>Hydratation</h3>
+                    <p id="hydra-texte"></p>
+                    <div class="quete-barre">
+                        <div id="hydra-fill" class="quete-fill"></div>
+                    </div>
+                    <button id="btn-hydra">+300 ml</button>
+                    <ul id="hydra-historique"></ul>
+                </div>
+                <p id="rappel-hydra"></p>
             </div>
             <div id="page-mobilite" class="page">
                 <h2>Mobilité</h2>
@@ -239,10 +237,19 @@
                 <ul id="routine-liste"></ul>
             </div>
                 <div id="page-profil" class="page">
+                    <button id="btn-retour-profil" class="btn-tertiaire">← Retour</button>
+                    <h2>Profil / Progression</h2>
+
+                    <h3>Progression par module</h3>
+                    <div id="modules-progression"></div>
+
+                    <h3>Calendrier d'activité</h3>
+                    <div id="calendrier-modules"></div>
+
                     <h3>Badges</h3>
                     <ul id="liste-badges"></ul>
-                    <button id="btn-retour-profil" class="btn-tertiaire">← Retour</button>
-                    <h2>Profil / Réglages</h2>
+
+                    <h3>Fiche</h3>
                     <div id="fiche-perso">
                         <label>Poids (kg) : <input type="number" id="input-poids-perso"></label>
                     </div>
