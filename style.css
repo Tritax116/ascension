@@ -1,3 +1,22 @@
+@font-face {
+    font-family: "Morhefa";
+    src: url("fonts/morhefa-400.woff2") format("woff2");
+    font-weight: 400;
+    font-display: swap;
+}
+@font-face {
+    font-family: "Morhefa";
+    src: url("fonts/morhefa-500.woff2") format("woff2");
+    font-weight: 500;
+    font-display: swap;
+}
+@font-face {
+    font-family: "Morhefa";
+    src: url("fonts/morhefa-700.woff2") format("woff2");
+    font-weight: 700;
+    font-display: swap;
+}
+
 :root {
     --bg: #070706;
     --surface: #1B1C13;
@@ -31,10 +50,19 @@
 body{
     background-color: var(--bg);
     color: var(--texte);
-    font-family: sans-serif;
+    font-family: "Morhefa", system-ui, sans-serif;
     margin: 0;
-    padding: 60px;
-    padding-bottom: 80px;
+    padding: 64px var(--espace-lg) calc(80px + env(safe-area-inset-bottom));
+}
+body::before{
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+        radial-gradient(60% 45% at 18% 0%, rgba(140, 139, 94, 0.20), transparent 70%),
+        radial-gradient(55% 40% at 88% 12%, rgba(242, 199, 68, 0.10), transparent 70%);
 }
 
 #calendar {
@@ -670,4 +698,17 @@ h1{
     border-radius: var(--rayon);
     margin: 16px 0;
     overflow: hidden;
+}
+
+.compteur-valeur,
+#rang-score,
+#seance-duree,
+#seance-volume,
+#seance-series,
+#course-distance,
+#course-temps,
+#course-allure,
+#hydra-texte,
+#nutri-calories {
+    font-variant-numeric: tabular-nums;
 }

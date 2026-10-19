@@ -1,6 +1,14 @@
 const CACHE = "ascension-v5";
-const FICHIERS = ["index.html", "style.css", "app.js", "icon-192.png", "icon-512.png"];
-
+const FICHIERS = [
+    "index.html",
+    "style.css",
+    "app.js",
+    "icon-192.png",
+    "icon-512.png",
+    "fonts/morhefa-400.woff2",
+    "fonts/morhefa-500.woff2",
+    "fonts/morhefa-700.woff2"
+];
 self.addEventListener("install", function(e){
     self.skipWaiting();
     e.waitUntil(caches.open(CACHE).then(function(c){ return c.addAll(FICHIERS); }));
