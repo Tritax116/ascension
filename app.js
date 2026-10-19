@@ -19,14 +19,14 @@ let seanceEnCours = null;
 
 const nomsRangs = ["Bronze", "Argent", "Or", "Platine", "Diamant"];
 
-function pad(n){
-    if(n<10){
-        return "0" + n; 
+function pad(n) {
+    if (n < 10) {
+        return "0" + n;
     }
-    return "" + n; 
+    return "" + n;
 }
 
-function formaterDuree(minutes){
+function formaterDuree(minutes) {
     const totalSec = Math.round(minutes * 60);
     if (totalSec < 60) {
         return totalSec + " s";
@@ -39,28 +39,28 @@ function formaterDuree(minutes){
     return min + " min";
 }
 
-function todayStr(){
+function todayStr() {
     const d = new Date();
-    return d.getFullYear() + "-" + pad(d.getMonth() +1) + "-" + pad(d.getDate());
+    return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
 }
 
-function addDays(dateStr, delta){
+function addDays(dateStr, delta) {
     const morceaux = dateStr.split("-");
     const m = Number(morceaux[1]);
     const y = Number(morceaux[0]);
     const j = Number(morceaux[2]);
     const dt = new Date(y, m - 1, j);
     dt.setDate(dt.getDate() + delta);
-    return  dt.getFullYear() + "-" + pad(dt.getMonth() + 1) + "-" + pad(dt.getDate());
+    return dt.getFullYear() + "-" + pad(dt.getMonth() + 1) + "-" + pad(dt.getDate());
 }
 
 
-let etat = JSON.parse(localStorage.getItem("etat")) || {xp:0, streak:0, bestStreak:0, lastActiveDate:null, history:{}, muscu:[], course:[]};
+let etat = JSON.parse(localStorage.getItem("etat")) || { xp: 0, streak: 0, bestStreak: 0, lastActiveDate: null, history: {}, muscu: [], course: [] };
 const badges = [
-    {id: "muscu10", nom: "10 exercices de muscu", type: "muscu", cible: 10, xp: 150},
-    {id: "courses5", nom: "5 courses", type: "course", cible: 5, xp: 200},
-    {id: "streak7", nom: "Streak de 7 jours", type: "streak", cible: 7, xp: 100},
-    {id: "streak30", nom: "Streak de 30 jours", type: "streak", cible: 30, xp: 500},
+    { id: "muscu10", nom: "10 exercices de muscu", type: "muscu", cible: 10, xp: 150 },
+    { id: "courses5", nom: "5 courses", type: "course", cible: 5, xp: 200 },
+    { id: "streak7", nom: "Streak de 7 jours", type: "streak", cible: 7, xp: 100 },
+    { id: "streak30", nom: "Streak de 30 jours", type: "streak", cible: 30, xp: 500 },
 ];
 if (!etat.badges) etat.badges = {};
 if (!etat.muscu) etat.muscu = [];
@@ -71,24 +71,24 @@ if (!etat.mobilite) etat.mobilite = [];
 if (!etat.seances) etat.seances = [];
 if (!etat.nutrition) etat.nutrition = { objectif: 2200, repas: [] };
 let rangs = [
-        {nom : "Bronze", division: "III", seuil: 0, couleur: "#A67C52"},
-        {nom : "Bronze", division: "II", seuil: 100, couleur: "#A67C52"},
-        {nom: "Bronze", division: "I", seuil: 250, couleur: "#A67C52"},
-        {nom: "Argent", division: "III", seuil: 450, couleur: "#B0B0B0"},
-        {nom: "Argent", division: "II", seuil: 700, couleur: "#B0B0B0"},
-        {nom: "Argent", division: "I", seuil: 1000, couleur: "#B0B0B0"},
-        {nom: "Or", division: "III", seuil: 1400, couleur: "#F2C744"},
-        {nom: "Or", division: "II", seuil: 1900, couleur: "#F2C744"},
-        {nom: "Or", division: "I", seuil: 2500, couleur: "#F2C744"},
-        {nom: "Platine", division: "III", seuil: 3200, couleur: "#5DBEBE"},
-        {nom: "Platine", division: "II", seuil: 4000, couleur: "#5DBEBE"},
-        {nom: "Platine", division: "I", seuil: 5000, couleur: "#5DBEBE"},
-        {nom: "Diamant", division: "III", seuil: 6200, couleur: "#A78BFA"},
-        {nom: "Diamant", division: "II", seuil: 7600, couleur: "#A78BFA"},
-        {nom: "Diamant", division: "I", seuil: 9200, couleur: "#A78BFA"},
+    { nom: "Bronze", division: "III", seuil: 0, couleur: "#A67C52" },
+    { nom: "Bronze", division: "II", seuil: 100, couleur: "#A67C52" },
+    { nom: "Bronze", division: "I", seuil: 250, couleur: "#A67C52" },
+    { nom: "Argent", division: "III", seuil: 450, couleur: "#B0B0B0" },
+    { nom: "Argent", division: "II", seuil: 700, couleur: "#B0B0B0" },
+    { nom: "Argent", division: "I", seuil: 1000, couleur: "#B0B0B0" },
+    { nom: "Or", division: "III", seuil: 1400, couleur: "#F2C744" },
+    { nom: "Or", division: "II", seuil: 1900, couleur: "#F2C744" },
+    { nom: "Or", division: "I", seuil: 2500, couleur: "#F2C744" },
+    { nom: "Platine", division: "III", seuil: 3200, couleur: "#5DBEBE" },
+    { nom: "Platine", division: "II", seuil: 4000, couleur: "#5DBEBE" },
+    { nom: "Platine", division: "I", seuil: 5000, couleur: "#5DBEBE" },
+    { nom: "Diamant", division: "III", seuil: 6200, couleur: "#A78BFA" },
+    { nom: "Diamant", division: "II", seuil: 7600, couleur: "#A78BFA" },
+    { nom: "Diamant", division: "I", seuil: 9200, couleur: "#A78BFA" },
 ];
 
-function save (){
+function save() {
     localStorage.setItem("etat", JSON.stringify(etat));
 
 }
@@ -97,33 +97,33 @@ const citations = [
     "Stay hard?", "La discipline, c'est la liberté"];
 
 
-function markPresence(){
+function markPresence() {
     const hoy = todayStr();
     const rang = getRang();
-    if(etat.history[hoy] && etat.history[hoy].presence)
+    if (etat.history[hoy] && etat.history[hoy].presence)
         return;
-    etat.history[hoy] = { presence: true};
+    etat.history[hoy] = { presence: true };
     etat.xp += 10;
     const ayer = addDays(hoy, -1);
-    if(etat.lastActiveDate === ayer){
-        etat.streak +=1;
+    if (etat.lastActiveDate === ayer) {
+        etat.streak += 1;
     }
     else {
         etat.streak = 1;
-        if (etat.lastActiveDate){
+        if (etat.lastActiveDate) {
             const jours = joursEntre(etat.lastActiveDate, hoy);
-            if (jours >= 7){
-                if (rang.index > 0){
+            if (jours >= 7) {
+                if (rang.index > 0) {
                     etat.xp = rangs[rang.index - 1].seuil;
                 }
             }
         }
     }
-        if (etat.streak > etat.bestStreak) {
-    etat.bestStreak = etat.streak;
-}
-etat.lastActiveDate = hoy;
-render();
+    if (etat.streak > etat.bestStreak) {
+        etat.bestStreak = etat.streak;
+    }
+    etat.lastActiveDate = hoy;
+    render();
     save();
 }
 
@@ -132,7 +132,7 @@ for (let i = 0; i < boutonsOnglets.length; i++) {
     boutonsOnglets[i].addEventListener("click", function () {
         changerPage(boutonsOnglets[i].dataset.page);
     });
-    
+
 }
 
 document.getElementById("btn-presence").addEventListener("click", markPresence);
@@ -187,19 +187,20 @@ render();
 
 
 
-function citationsAleatoire(){
-    const i = Math.floor(Math.random()* citations.length);
+function citationsAleatoire() {
+    const i = Math.floor(Math.random() * citations.length);
     return citations[i];
 }
 
-function valeurBadge(type){
+function valeurBadge(type) {
     if (type === "muscu") return etat.muscu.length;
     if (type === "course") return etat.course.length;
     if (type === "streak") return etat.bestStreak;
     return 0;
 }
 
-function render(){;
+function render() {
+    ;
     const hoy = todayStr();
     const rang = getRang();
     const rangActuel = rang.nom + " " + rang.division;
@@ -212,23 +213,23 @@ function render(){;
     document.getElementById("lock-screen").hidden = dejaFait;
     document.getElementById("dashboard").hidden = !dejaFait;
     let mot = "jours";
-    if (etat.streak === 1){
+    if (etat.streak === 1) {
         mot = "jour"
-    } 
+    }
     const prochain = xpProchainStade();
     if (prochain) {
         document.getElementById("avatar-next").textContent = "Encore : " + prochain.xp + " XP avant " + prochain.nom;
     } else {
         document.getElementById("avatar-next").textContent = "Stade maximal atteint";
     }
-    document.getElementById("streak-count").textContent = "Streak : " +etat.streak + " " + mot;
+    document.getElementById("streak-count").textContent = "Streak : " + etat.streak + " " + mot;
     document.getElementById("level-badge").textContent = rang.nom + " " + rang.division;
     document.getElementById("rang-score").textContent = Math.round(rang.pourcentage) + " / 100";
     document.getElementById("level-badge").style.color = rang.couleur;
-    document.getElementById("quote").textContent= citationsAleatoire();
+    document.getElementById("quote").textContent = citationsAleatoire();
     document.getElementById("xp-fill").style.width = rang.pourcentage + "%";
     document.getElementById("xp-fill").style.backgroundColor = rang.couleur;
-    document.getElementById("avatar").innerHTML = '<img src="avatar-pixel-' + stageAvatar + '.png" alt="avatar">';    document.getElementById("fiche-classe").textContent = "Classe : " + calculerClasse();
+    document.getElementById("avatar").innerHTML = '<img src="avatar-pixel-' + stageAvatar + '.png" alt="avatar">'; document.getElementById("fiche-classe").textContent = "Classe : " + calculerClasse();
     document.getElementById("fiche-titre").textContent = "Titre : " + calculerTitre();
     document.getElementById("message-coach").textContent = messageCoach();
     renderCourse();
@@ -247,22 +248,23 @@ function render(){;
     renderModules();
     renderCalendrierModules();
     renderNutrition();
+    renderStreak();
 }
 setInterval(majDureeSeance, 1000);
-function getLevel(xp){
-    if (xp >= 1000 ) {
+function getLevel(xp) {
+    if (xp >= 1000) {
         return "⚡ Kratos Ragnarök";
     }
-    if (xp >= 600){
+    if (xp >= 600) {
         return "👹 Doomfist";
     }
-    if (xp >= 300){
+    if (xp >= 300) {
         return "🛡️ Titan";
     }
-    if (xp >= 100){
+    if (xp >= 100) {
         return "⚔️ Guerrier";
     }
-    else{
+    else {
         return "Recrue";
     }
 }
@@ -282,18 +284,18 @@ function markFullSession() {
 }
 
 
-function xpProgress(xp){
-    if(xp >=1000){
+function xpProgress(xp) {
+    if (xp >= 1000) {
         return 100;
     }
-    if(xp >= 600){
+    if (xp >= 600) {
         return (xp - 600) / (1000 - 600) * 100;
     }
-    if(xp >= 300){
+    if (xp >= 300) {
         return (xp - 300) / (600 - 300) * 100;
     }
-    if(xp >= 100){
-        return(xp - 100) / (300 - 100) * 100;
+    if (xp >= 100) {
+        return (xp - 100) / (300 - 100) * 100;
     }
     return (xp - 0) / (100 - 0) * 100;
 }
@@ -302,7 +304,7 @@ etat.muscu = etat.muscu.filter(x => x.nom !== "" && x.poids !== "" && x.reps !==
 save();
 render();
 
-function renderMuscu(){
+function renderMuscu() {
     const liste = document.getElementById("liste-exercice");
     liste.innerHTML = "";
     const parDate = {};
@@ -340,25 +342,25 @@ function renderMuscu(){
 }
 
 
-function distanceKm(lat1, lon1, lat2, lon2){
+function distanceKm(lat1, lon1, lat2, lon2) {
     const R = 6371;
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-              Math.sin(dLon/2) * Math.sin(dLon/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c;
 }
 
-function demarrerCourse(){
+function demarrerCourse() {
     distanceCourse = 0;
     dernierePosition = null;
     debutCourse = Date.now();
     initCarte();
     carte.invalidateSize();
     pointsTrace = [];
-    if (ligneTrace){
+    if (ligneTrace) {
         carte.removeLayer(ligneTrace);
         ligneTrace = null;
     }
@@ -367,7 +369,7 @@ function demarrerCourse(){
     majEtatCourse(true);
 }
 
-function lancerSuivi(){
+function lancerSuivi() {
     return navigator.geolocation.watchPosition(
         traiterPosition,
         erreurPosition,
@@ -375,10 +377,11 @@ function lancerSuivi(){
     );
 }
 
-function erreurPosition(err){
-    document.getElementById("course-etat").textContent = "⚠ GPS : " + err.message;}
+function erreurPosition(err) {
+    document.getElementById("course-etat").textContent = "⚠ GPS : " + err.message;
+}
 
-function initCarte(){
+function initCarte() {
     if (carte) return;
     carte = L.map("carte-course").setView([48.8566, 2.3522], 13);
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -386,13 +389,13 @@ function initCarte(){
     }).addTo(carte);
 }
 
-function mettreAJourTemps(){
+function mettreAJourTemps() {
     const ecoule = Date.now() - debutCourse;
     const secondesTotal = Math.floor(ecoule / 1000);
     const minutes = Math.floor(secondesTotal / 60);
     const secondes = secondesTotal % 60;
     document.getElementById("course-temps").textContent = "Temps : " + pad(minutes) + ":" + pad(secondes);
-    if(distanceCourse > 0){
+    if (distanceCourse > 0) {
         const minutesTotal = ecoule / 1000 / 60;
         const allure = minutesTotal / distanceCourse;
         const alMin = Math.floor(allure);
@@ -401,15 +404,15 @@ function mettreAJourTemps(){
     }
 }
 
-function togglePause(){
-    if(!enPause){
+function togglePause() {
+    if (!enPause) {
         enPause = true;
         navigator.geolocation.clearWatch(suiviId);
         clearInterval(intervalId);
         pauseDebut = Date.now();
         document.getElementById("btn-pause-course").textContent = "reprendre";
     }
-    else{
+    else {
         enPause = false;
         debutCourse += (Date.now() - pauseDebut);
         dernierePosition = null;
@@ -419,11 +422,11 @@ function togglePause(){
     }
 }
 
-function terminerCourse(){
+function terminerCourse() {
     navigator.geolocation.clearWatch(suiviId);
     clearInterval(intervalId);
     const dureeMinutes = (Date.now() - debutCourse) / 1000 / 60;
-        etat.course.push({
+    etat.course.push({
         distance: distanceCourse,
         duree: dureeMinutes,
         date: todayStr(),
@@ -431,10 +434,10 @@ function terminerCourse(){
         trace: pointsTrace.slice()
     });
     let bonusXp = distanceCourse * 10;
-    if (bonusXp > 80){
+    if (bonusXp > 80) {
         bonusXp = 80;
     }
-    if (bonusXp < 15){
+    if (bonusXp < 15) {
         bonusXp = 15;
     }
     etat.xp += bonusXp;
@@ -446,64 +449,64 @@ function terminerCourse(){
     majEtatCourse(false);
 }
 
-function renderCourse(){
+function renderCourse() {
     let listeCourses = document.getElementById("liste-courses");
     listeCourses.innerHTML = "";
-    if (etat.course.length === 0){
+    if (etat.course.length === 0) {
         listeCourses.innerHTML = "<li>Aucune course encore. Lance ta première sortie !</li>";
         return;
     }
     const indices = [];
-    for (let i = 0; i < etat.course.length; i++){ indices.push(i); }
-    indices.sort(function(a, b){ return (etat.course[b].favori ? 1 : 0) - (etat.course[a].favori ? 1 : 0); });
+    for (let i = 0; i < etat.course.length; i++) { indices.push(i); }
+    indices.sort(function (a, b) { return (etat.course[b].favori ? 1 : 0) - (etat.course[a].favori ? 1 : 0); });
     for (let k = 0; k < indices.length; k++) {
         const i = indices[k];
         const c = etat.course[i];
         const ligne = document.createElement("li");
-                ligne.textContent = (c.favori ? "★ " : "") + c.distance.toFixed(2) + " km - " + formaterDuree(c.duree) + " - " + c.date + " ";
+        ligne.textContent = (c.favori ? "★ " : "") + c.distance.toFixed(2) + " km - " + formaterDuree(c.duree) + " - " + c.date + " ";
         const btnFav = document.createElement("button");
         btnFav.textContent = c.favori ? "★" : "☆";
         btnFav.className = "btn-suppr";
-        btnFav.addEventListener("click", function(){ toggleFavori(i); });
+        btnFav.addEventListener("click", function () { toggleFavori(i); });
         ligne.appendChild(btnFav);
-        if (c.trace && c.trace.length > 0){
+        if (c.trace && c.trace.length > 0) {
             const btnVoir = document.createElement("button");
             btnVoir.textContent = "Voir";
             btnVoir.className = "btn-suppr";
-            btnVoir.addEventListener("click", function(){ voirParcours(i); });
+            btnVoir.addEventListener("click", function () { voirParcours(i); });
             ligne.appendChild(btnVoir);
         }
         listeCourses.appendChild(ligne);
     }
 }
 
-function toggleFavori(i){
+function toggleFavori(i) {
     etat.course[i].favori = !etat.course[i].favori;
     save();
     renderCourse();
 }
 
-function voirParcours(i){
+function voirParcours(i) {
     const c = etat.course[i];
-    if (!c.trace || c.trace.length === 0){ return; }
+    if (!c.trace || c.trace.length === 0) { return; }
     initCarte();
     carte.invalidateSize();
-    if (ligneTrace){ carte.removeLayer(ligneTrace); }
+    if (ligneTrace) { carte.removeLayer(ligneTrace); }
     ligneTrace = L.polyline(c.trace, { color: "#5DBEBE", weight: 5 }).addTo(carte);
     carte.fitBounds(ligneTrace.getBounds());
     document.getElementById("carte-course").scrollIntoView({ behavior: "smooth" });
 }
 
-function getRang(){
+function getRang() {
     let rangActuel = rangs[0];
     for (let i = 0; i < rangs.length; i++) {
-        if (etat.xp>= rangs[i].seuil){
+        if (etat.xp >= rangs[i].seuil) {
             rangActuel = rangs[i];
         }
     }
     let index = rangs.indexOf(rangActuel);
     let seuilSuivant;
-    if ( index < rangs.length - 1){
+    if (index < rangs.length - 1) {
         seuilSuivant = rangs[index + 1].seuil;
     }
     else {
@@ -513,34 +516,34 @@ function getRang(){
     return { nom: rangActuel.nom, division: rangActuel.division, couleur: rangActuel.couleur, pourcentage: pourcentage, index: index };
 }
 
-function joursEntre(date1, date2){
+function joursEntre(date1, date2) {
     const d1 = new Date(date1);
     const d2 = new Date(date2);
     const diffMs = d2 - d1;
     return Math.round(diffMs / (1000 * 60 * 60 * 24));
 }
 
-function teinteAvatar(hex, delta){
+function teinteAvatar(hex, delta) {
     const n = parseInt(hex.slice(1), 16);
     const r = Math.max(0, Math.min(255, ((n >> 16) & 255) + delta));
     const g = Math.max(0, Math.min(255, ((n >> 8) & 255) + delta));
     const b = Math.max(0, Math.min(255, (n & 255) + delta));
     return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
 }
-function avatarSVG(stage, couleur){
+function avatarSVG(stage, couleur) {
     const params = [
-        {shoulder: 34, waist: 29, armW: 13, armOff: 40, armH: 62},
-        {shoulder: 41, waist: 31, armW: 17, armOff: 47, armH: 66},
-        {shoulder: 49, waist: 33, armW: 21, armOff: 55, armH: 70},
-        {shoulder: 57, waist: 35, armW: 25, armOff: 63, armH: 74},
-        {shoulder: 66, waist: 37, armW: 30, armOff: 72, armH: 78}
+        { shoulder: 34, waist: 29, armW: 13, armOff: 40, armH: 62 },
+        { shoulder: 41, waist: 31, armW: 17, armOff: 47, armH: 66 },
+        { shoulder: 49, waist: 33, armW: 21, armOff: 55, armH: 70 },
+        { shoulder: 57, waist: 35, armW: 25, armOff: 63, armH: 74 },
+        { shoulder: 66, waist: 37, armW: 30, armOff: 72, armH: 78 }
     ];
     const p = params[stage];
     const cx = 100;
-    const torsoPath = "M " + (cx-p.shoulder) + ",98 Q " + cx + ",76 " + (cx+p.shoulder) + ",98 L " + (cx+p.waist) + ",205 L " + (cx-p.waist) + ",205 Z";
+    const torsoPath = "M " + (cx - p.shoulder) + ",98 Q " + cx + ",76 " + (cx + p.shoulder) + ",98 L " + (cx + p.waist) + ",205 L " + (cx - p.waist) + ",205 Z";
     const clair = teinteAvatar(couleur, 35);
     const fonce = teinteAvatar(couleur, -45);
-        return '<svg viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg">' +
+    return '<svg viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg">' +
         '<defs><linearGradient id="avatarGrad" x1="0" y1="0" x2="0" y2="1">' +
         '<stop offset="0" stop-color="' + clair + '"/>' +
         '<stop offset="1" stop-color="' + fonce + '"/>' +
@@ -548,13 +551,13 @@ function avatarSVG(stage, couleur){
         '<ellipse cx="100" cy="210" rx="46" ry="7" fill="rgba(0,0,0,0.45)"/>' +
         '<circle cx="100" cy="45" r="26" fill="url(#avatarGrad)"/>' +
         '<rect x="86" y="64" width="28" height="24" fill="url(#avatarGrad)"/>' +
-        '<rect x="' + (cx-p.armOff-p.armW/2) + '" y="96" width="' + p.armW + '" height="' + p.armH + '" rx="' + (p.armW/2) + '" fill="url(#avatarGrad)"/>' +
-        '<rect x="' + (cx+p.armOff-p.armW/2) + '" y="96" width="' + p.armW + '" height="' + p.armH + '" rx="' + (p.armW/2) + '" fill="url(#avatarGrad)"/>' +
+        '<rect x="' + (cx - p.armOff - p.armW / 2) + '" y="96" width="' + p.armW + '" height="' + p.armH + '" rx="' + (p.armW / 2) + '" fill="url(#avatarGrad)"/>' +
+        '<rect x="' + (cx + p.armOff - p.armW / 2) + '" y="96" width="' + p.armW + '" height="' + p.armH + '" rx="' + (p.armW / 2) + '" fill="url(#avatarGrad)"/>' +
         '<path d="' + torsoPath + '" fill="url(#avatarGrad)"/>' +
         '</svg>';
 }
 
-function changerPage (nom){
+function changerPage(nom) {
     const pages = document.querySelectorAll(".page");
     for (let i = 0; i < pages.length; i++) {
         pages[i].classList.remove("actif");
@@ -570,35 +573,35 @@ function changerPage (nom){
     }
 }
 
-function volumeMuscle(muscle){
+function volumeMuscle(muscle) {
     let total = 0;
     for (let i = 0; i < etat.muscu.length; i++) {
         if (etat.muscu[i].muscle === muscle) {
             total += Number(etat.muscu[i].poids) * Number(etat.muscu[i].reps);
         }
-        
+
     }
     return total;
 }
 
-function rangMuscle(muscle){
+function rangMuscle(muscle) {
     const volume = volumeMuscle(muscle);
     const xpEquivalent = volume / 20;
     let rangActuel = rangs[0];
     for (let i = 0; i < rangs.length; i++) {
         if (xpEquivalent >= rangs[i].seuil) {
             rangActuel = rangs[i];
-        } 
+        }
     }
     return rangActuel;
 }
 
-function colorerMuscles(){
+function colorerMuscles() {
     const zones = document.querySelectorAll("[data-muscle]");
-    for (let i = 0; i < zones.length; i++){
+    for (let i = 0; i < zones.length; i++) {
         const nom = zones[i].dataset.muscle;
         const volume = volumeMuscle(nom);
-        if (volume === 0){
+        if (volume === 0) {
             zones[i].style.fill = "";
         } else {
             zones[i].style.fill = rangMuscle(nom).couleur;
@@ -606,7 +609,7 @@ function colorerMuscles(){
     }
 }
 
-function changerVueMuscle(vue){
+function changerVueMuscle(vue) {
     const vues = document.querySelectorAll(".view");
     for (let i = 0; i < vues.length; i++) {
         vues[i].classList.remove("on");
@@ -619,7 +622,7 @@ function changerVueMuscle(vue){
     document.querySelector('.vue-muscle[data-vue="' + vue + '"]').classList.add("on");
 }
 
-function afficherDetailMuscle(muscle, e){
+function afficherDetailMuscle(muscle, e) {
     const bulle = document.getElementById("detail-muscle");
     bulle.hidden = false;
     bulle.style.left = e.clientX + "px";
@@ -663,7 +666,7 @@ document.getElementById("btn-retour-muscle").addEventListener("click", function 
     document.getElementById("detail-muscle").hidden = true;
 });
 
-function genererQueteDuJour(){
+function genererQueteDuJour() {
     if (etat.quete && etat.quete.date === todayStr()) {
         return;
     }
@@ -684,10 +687,10 @@ function genererQueteDuJour(){
     save();
 }
 
-function renderQuete(){
+function renderQuete() {
     const liste = document.getElementById("quete-objectifs");
     liste.innerHTML = "";
-        if (etat.quete.penalite) {
+    if (etat.quete.penalite) {
         document.getElementById("quete-penalite").textContent = "⚔️ Quête de rachat — tu as raté hier, objectifs renforcés !";
     } else {
         document.getElementById("quete-penalite").textContent = "";
@@ -742,9 +745,9 @@ function verifierQueteComplete() {
     for (let i = 0; i < etat.quete.objectifs.length; i++) {
         if (etat.quete.objectifs[i].actuel < etat.quete.objectifs[i].cible) {
             return;
-            
+
         }
-        
+
     }
     etat.quete.faite = true;
     etat.xp += 30;
@@ -753,7 +756,7 @@ function verifierQueteComplete() {
     save();
 }
 
-function tempsRestantQuete(){
+function tempsRestantQuete() {
     const maintenant = new Date();
     const minuit = new Date(maintenant.getFullYear(), maintenant.getMonth(), maintenant.getDate() + 1, 0, 0, 0);
     const restant = minuit - maintenant;
@@ -815,7 +818,7 @@ function setPoids() {
     render();
 }
 
-function renderDashboard(){
+function renderDashboard() {
     const rang = getRang();
     document.getElementById("dash-niveau").textContent = Math.floor(etat.xp / 100) + 1;
     let seances = etat.course.length;
@@ -829,7 +832,7 @@ function renderDashboard(){
 }
 
 function mesurerMobilite() {
-   const s = noteSelectionnee("sel-souplesse");
+    const s = noteSelectionnee("sel-souplesse");
     const sq = noteSelectionnee("sel-squat");
     const ep = noteSelectionnee("sel-epaules");
     const score = Math.round((s + sq + ep) / 15 * 100);
@@ -866,7 +869,7 @@ function renderMobilite() {
     }
 }
 
-function xpProchainStade(){
+function xpProchainStade() {
     const rang = getRang();
     for (let i = rang.index + 1; i < rangs.length; i++) {
         if (rangs[i].nom !== rang.nom && rangs[i].seuil > etat.xp) {
@@ -883,7 +886,7 @@ function supprimerExercice(i) {
     render();
 }
 
-function majEtatCourse(enCourse){
+function majEtatCourse(enCourse) {
     if (enCourse) {
         document.getElementById("course-etat").textContent = "● En cours";
         document.getElementById("btn-start-course").hidden = true;
@@ -898,15 +901,15 @@ function majEtatCourse(enCourse){
     }
 }
 
-function noteSelectionnee(idSelecteur){
+function noteSelectionnee(idSelecteur) {
     const actif = document.querySelector("#" + idSelecteur + " .btn-note.actif");
-    if (actif) {  
+    if (actif) {
         return Number(actif.dataset.note);
     }
     return 0;
 }
 
-function celebrer(message){ 
+function celebrer(message) {
     document.getElementById("celebration-message").textContent = message;
     document.getElementById("celebration").hidden = false;
     setTimeout(function () {
@@ -915,18 +918,18 @@ function celebrer(message){
 }
 
 
-function calculerClasse(){
+function calculerClasse() {
     if (etat.muscu.length > etat.course.length) return "Bruiser";
     if (etat.course.length > etat.muscu.length) return "Rôdeur";
     return "Hybride";
 }
-function calculerTitre(){
+function calculerTitre() {
     if (etat.bestStreak >= 30) return "Sans faille";
     if (etat.bestStreak >= 7) return "Assidu";
     return "Recrue";
 }
 
-function verifierBadges(){
+function verifierBadges() {
     for (let i = 0; i < badges.length; i++) {
         const badge = badges[i];
         if (!etat.badges[badge.id] && valeurBadge(badge.type) >= badge.cible) {
@@ -937,14 +940,14 @@ function verifierBadges(){
     }
 }
 
-function renderBadges(){
+function renderBadges() {
     const liste = document.getElementById("liste-badges");
     liste.innerHTML = "";
     for (let i = 0; i < badges.length; i++) {
         const b = badges[i];
         const ligne = document.createElement("li");
         if (etat.badges[b.id]) {
-            ligne.textContent ="✅ " + b.nom + " (" + b.xp + " XP)";
+            ligne.textContent = "✅ " + b.nom + " (" + b.xp + " XP)";
         } else {
             ligne.textContent = "🔒 " + b.nom + " -- " + valeurBadge(b.type) + " / " + b.cible;
         }
@@ -952,14 +955,45 @@ function renderBadges(){
     }
 }
 
-function messageCoach(){
+function messageCoach() {
     if (etat.quete && etat.quete.faite) return "Quête du jour bouclée. Tu tiens ton rang.";
-    if (etat.streak >= 7) return "Streak de "+ etat.streak + " jours. La discipline devient une habitude.";
+    if (etat.streak >= 7) return "Streak de " + etat.streak + " jours. La discipline devient une habitude.";
     if (etat.streak === 0) return "Nouveau départ. Aujourd'hui ! tu reprends le contrôle.";
     return "Ta quête t'attend. Ne la laisse pas la journée filer.";
 }
+function renderStreak() {
+    const conteneur = document.getElementById("streak-semaine");
+    conteneur.innerHTML = "";
+    const lettres = ["D", "L", "M", "M", "J", "V", "S"];
 
-function renderJours(){
+    for (let i = 6; i >= 0; i--) {
+        const date = addDays(todayStr(), -i);
+
+        const jour = document.createElement("div");
+        jour.className = "streak-jour";
+        if (i === 0) {
+            jour.classList.add("aujourdhui");
+        }
+
+        const point = document.createElement("span");
+        point.className = "streak-point";
+        if (etat.history[date] && etat.history[date].presence) {
+            point.classList.add("rempli");
+        }
+
+        const morceaux = date.split("-");
+        const d = new Date(Number(morceaux[0]), Number(morceaux[1]) - 1, Number(morceaux[2]));
+
+        const lettre = document.createElement("span");
+        lettre.className = "streak-lettre";
+        lettre.textContent = lettres[d.getDay()];
+
+        jour.appendChild(point);
+        jour.appendChild(lettre);
+        conteneur.appendChild(jour);
+    }
+}
+function renderJours() {
     const conteneur = document.getElementById("jours-semaine");
     conteneur.innerHTML = "";
     const jours = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
@@ -977,17 +1011,17 @@ function renderJours(){
     }
 }
 
-function demarrerSeance(){
+function demarrerSeance() {
     seanceEnCours = { debut: Date.now(), series: [] };
     changerPage("seance");
 }
 
-function abandonnerSeance(){
+function abandonnerSeance() {
     seanceEnCours = null;
     changerPage("muscu");
 }
 
-function ajouterSerie(){
+function ajouterSerie() {
     const nom = document.getElementById("seance-exo").value;
     const muscle = document.getElementById("seance-muscle").value;
     const poids = document.getElementById("seance-poids").value;
@@ -1002,7 +1036,7 @@ function ajouterSerie(){
     renderSeance();
 }
 
-function renderSeance(){
+function renderSeance() {
     if (!seanceEnCours) {
         return;
     }
@@ -1037,8 +1071,8 @@ function renderSeance(){
     document.getElementById("seance-series").textContent = seanceEnCours.series.length + " séries";
 }
 
-function majDureeSeance(){
-    if (!seanceEnCours){
+function majDureeSeance() {
+    if (!seanceEnCours) {
         return;
     }
     const ecoule = Date.now() - seanceEnCours.debut;
@@ -1048,7 +1082,7 @@ function majDureeSeance(){
     document.getElementById("seance-duree").textContent = pad(min) + ":" + pad(sec);
 }
 
-function terminerSeance(){
+function terminerSeance() {
     if (!seanceEnCours || seanceEnCours.series.length === 0) {
         return;
     }
@@ -1063,7 +1097,7 @@ function terminerSeance(){
         volume: volume,
         series: seanceEnCours.series
     });
-        for (let i = 0; i < seanceEnCours.series.length; i++) {
+    for (let i = 0; i < seanceEnCours.series.length; i++) {
         const s = seanceEnCours.series[i];
         etat.muscu.push({ nom: s.nom, poids: s.poids, reps: s.reps, muscle: s.muscle, date: todayStr() });
     }
@@ -1074,13 +1108,13 @@ function terminerSeance(){
     changerPage("muscu");
 }
 
-function renderSeances(){
+function renderSeances() {
     const liste = document.getElementById("seances-historique");
-    liste.innerHTML ="";
+    liste.innerHTML = "";
     for (let i = 0; i < etat.seances.length; i++) {
         const s = etat.seances[i];
         const li = document.createElement("li");
-                li.textContent = s.date + " — " + formaterDuree(s.duree) + " — " + s.volume + " kg — " + s.series.length + " séries";
+        li.textContent = s.date + " — " + formaterDuree(s.duree) + " — " + s.volume + " kg — " + s.series.length + " séries";
         liste.appendChild(li);
     }
 }
@@ -1090,7 +1124,7 @@ const routinesMobilite = {
     etirement: ["Étirement ischios — 30s", "Étirement quadriceps — 30s/jambe", "Étirement épaules — 30s", "Chat-vache — 1 min"]
 };
 
-function afficherRoutine(type){
+function afficherRoutine(type) {
     const liste = document.getElementById("routine-liste");
     liste.innerHTML = "";
     const routine = routinesMobilite[type];
@@ -1101,7 +1135,7 @@ function afficherRoutine(type){
     }
 }
 
-function toggleVue(){
+function toggleVue() {
     const acceuil = document.getElementById("page-accueil");
     acceuil.classList.toggle("mode-liste");
     const btn = document.getElementById("btn-toggle-vue");
@@ -1112,7 +1146,7 @@ function toggleVue(){
     }
 }
 
-function rappelHydratation(){
+function rappelHydratation() {
     const el = document.getElementById("rappel-hydra");
     let total = 0;
     for (let i = 0; i < etat.hydratation.prises.length; i++) {
@@ -1125,9 +1159,10 @@ function rappelHydratation(){
     }
 }
 
-function renderModules(){
+function renderModules() {
     const conteneur = document.getElementById("modules-progression");
     conteneur.innerHTML = "";
+
     let eauTotal = 0;
     for (let i = 0; i < etat.hydratation.prises.length; i++) {
         eauTotal += etat.hydratation.prises[i].ml;
@@ -1136,32 +1171,68 @@ function renderModules(){
     if (etat.mobilite.length > 0) {
         mobScore = etat.mobilite[etat.mobilite.length - 1].score;
     }
+
     const modules = [
-        { nom: "Muscu", pct: Math.min(100, etat.seances.length / 5 * 100), couleur: "#8C8B5E" },
-        { nom: "Course", pct: Math.min(100, etat.course.length / 3 * 100), couleur: "#8C8B5E" },
-        { nom: "Hydratation", pct: Math.min(100, eauTotal / etat.hydratation.objectif * 100), couleur: "#8C8B5E" },
-        { nom: "Mobilité", pct: mobScore, couleur: "#8C8B5E" }
+        { nom: "Muscu", pct: etat.seances.length / 5 * 100 },
+        { nom: "Course", pct: etat.course.length / 3 * 100 },
+        { nom: "Hydratation", pct: eauTotal / etat.hydratation.objectif * 100 },
+        { nom: "Mobilité", pct: mobScore }
     ];
+
+    const RAYON = 42;
+    const CIRCONFERENCE = 2 * Math.PI * RAYON;
+    const SVG_NS = "http://www.w3.org/2000/svg";
+
     for (let i = 0; i < modules.length; i++) {
-        const m = modules[i];
-        const label = document.createElement("div");
-        label.textContent = m.nom + " — " + Math.round(m.pct) + "%";
-        const barre = document.createElement("div");
-        barre.className = "module-barre";
-        const fill = document.createElement("div");
-        fill.className = "module-fill";
-        fill.style.width = m.pct + "%";
-        fill.style.backgroundColor = m.couleur;
-        barre.appendChild(fill);
-        conteneur.appendChild(label);
-        conteneur.appendChild(barre);
+        const pct = Math.max(0, Math.min(100, modules[i].pct));
+
+        const bloc = document.createElement("div");
+        bloc.className = "anneau";
+
+        const cadran = document.createElement("div");
+        cadran.className = "anneau-cadran";
+
+        const svg = document.createElementNS(SVG_NS, "svg");
+        svg.setAttribute("viewBox", "0 0 100 100");
+
+        const fond = document.createElementNS(SVG_NS, "circle");
+        fond.setAttribute("class", "anneau-fond");
+        fond.setAttribute("cx", "50");
+        fond.setAttribute("cy", "50");
+        fond.setAttribute("r", RAYON);
+
+        const jauge = document.createElementNS(SVG_NS, "circle");
+        jauge.setAttribute("class", "anneau-jauge");
+        jauge.setAttribute("cx", "50");
+        jauge.setAttribute("cy", "50");
+        jauge.setAttribute("r", RAYON);
+        jauge.setAttribute("stroke-dasharray", CIRCONFERENCE);
+        jauge.setAttribute("stroke-dashoffset", CIRCONFERENCE * (1 - pct / 100));
+
+        svg.appendChild(fond);
+        svg.appendChild(jauge);
+
+        const valeur = document.createElement("span");
+        valeur.className = "anneau-pct";
+        valeur.textContent = Math.round(pct) + "%";
+
+        cadran.appendChild(svg);
+        cadran.appendChild(valeur);
+
+        const nom = document.createElement("span");
+        nom.className = "anneau-nom";
+        nom.textContent = modules[i].nom;
+
+        bloc.appendChild(cadran);
+        bloc.appendChild(nom);
+        conteneur.appendChild(bloc);
     }
 }
 
-function renderCalendrierModules(){
+function renderCalendrierModules() {
     const conteneur = document.getElementById("calendrier-modules");
     conteneur.innerHTML = "";
-        const modules = [
+    const modules = [
         { nom: "Muscu", data: etat.muscu, couleur: "#8C8B5E" },
         { nom: "Course", data: etat.course, couleur: "#8C8B5E" },
         { nom: "Mobilité", data: etat.mobilite, couleur: "#8C8B5E" }
@@ -1193,13 +1264,13 @@ function renderCalendrierModules(){
     }
 }
 
-function traiterPosition(position){
-        if (position.coords.accuracy > 35){
+function traiterPosition(position) {
+    if (position.coords.accuracy > 35) {
         return;
     }
     const lat = position.coords.latitude;
     const lon = position.coords.longitude;
-    if (dernierePosition){
+    if (dernierePosition) {
         distanceCourse += distanceKm(dernierePosition.lat, dernierePosition.lon, lat, lon);
     }
     dernierePosition = { lat: lat, lon: lon }
@@ -1225,10 +1296,10 @@ function traiterPosition(position){
     }
 }
 
-    function renderNutrition(){
-    const repasJour = etat.nutrition.repas.filter(function(r){ return r.date === todayStr(); });
+function renderNutrition() {
+    const repasJour = etat.nutrition.repas.filter(function (r) { return r.date === todayStr(); });
     let kcal = 0, prot = 0, gluc = 0, lip = 0;
-    for (let i = 0; i < repasJour.length; i++){
+    for (let i = 0; i < repasJour.length; i++) {
         kcal += repasJour[i].kcal;
         prot += repasJour[i].prot;
         gluc += repasJour[i].gluc;
@@ -1241,53 +1312,53 @@ function traiterPosition(position){
     document.getElementById("nutri-macros").textContent = "P " + Math.round(prot) + "g · G " + Math.round(gluc) + "g · L " + Math.round(lip) + "g";
     const liste = document.getElementById("nutri-repas");
     liste.innerHTML = "";
-    if (repasJour.length === 0){
+    if (repasJour.length === 0) {
         liste.innerHTML = "<li>Aucun repas aujourd'hui. Ajoute ton premier plat !</li>";
         return;
     }
-    for (let i = 0; i < repasJour.length; i++){
+    for (let i = 0; i < repasJour.length; i++) {
         const li = document.createElement("li");
         li.textContent = repasJour[i].nom + " — " + Math.round(repasJour[i].kcal) + " kcal";
         liste.appendChild(li);
     }
 }
 
-function chercherAliment(){
+function chercherAliment() {
     const terme = document.getElementById("nutri-input").value;
     if (!terme) return;
     const url = "/.netlify/functions/food?q=" + encodeURIComponent(terme);
     document.getElementById("nutri-resultats").innerHTML = "<li>Recherche...</li>";
     fetch(url)
-        .then(function(reponse){ return reponse.json(); })
-        .then(function(data){ afficherResultats(data.products); })
-        .catch(function(err){
+        .then(function (reponse) { return reponse.json(); })
+        .then(function (data) { afficherResultats(data.products); })
+        .catch(function (err) {
             document.getElementById("nutri-resultats").innerHTML = "<li>Erreur : " + err.message + "</li>";
             console.log("Erreur nutrition :", err);
         });
 }
 
-function afficherResultats(produits){
+function afficherResultats(produits) {
     const liste = document.getElementById("nutri-resultats");
     liste.innerHTML = "";
-    for (let i = 0; i < produits.length; i++){
+    for (let i = 0; i < produits.length; i++) {
         const p = produits[i];
         const n = p.nutriments || {};
         const kcal = n["energy-kcal_100g"];
-        if (!p.product_name || kcal === undefined){ continue; }
+        if (!p.product_name || kcal === undefined) { continue; }
         const li = document.createElement("li");
         li.textContent = p.product_name + " — " + Math.round(kcal) + " kcal/100g";
-                li.style.cursor = "pointer";
-        li.addEventListener("click", function(){
+        li.style.cursor = "pointer";
+        li.addEventListener("click", function () {
             ajouterRepas(p.product_name, kcal, n.proteins_100g || 0, n.carbohydrates_100g || 0, n.fat_100g || 0);
         });
         liste.appendChild(li);
     }
-    if (liste.innerHTML === ""){ liste.innerHTML = "<li>Aucun résultat exploitable</li>"; }
+    if (liste.innerHTML === "") { liste.innerHTML = "<li>Aucun résultat exploitable</li>"; }
 }
 
-function ajouterRepas(nom, kcal100, prot100, gluc100, lip100){
+function ajouterRepas(nom, kcal100, prot100, gluc100, lip100) {
     const grammes = parseFloat(prompt("Combien de grammes ?", "100"));
-    if (!grammes){ return; }
+    if (!grammes) { return; }
     const facteur = grammes / 100;
     etat.nutrition.repas.push({
         nom: nom,

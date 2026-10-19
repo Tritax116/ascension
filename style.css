@@ -935,3 +935,115 @@ ul#seance-liste {
 #nutri-resultats li:active {
     background: rgba(140, 139, 94, 0.12);
 }
+
+#modules-progression {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--espace-md);
+}
+
+.anneau {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--espace-md);
+    border-radius: var(--rayon);
+    background: linear-gradient(160deg, #1F2016, var(--surface));
+    border: 1px solid rgba(180, 179, 137, 0.10);
+}
+
+.anneau-cadran {
+    position: relative;
+    width: 84px;
+    height: 84px;
+}
+
+.anneau-cadran svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+    transform: rotate(-90deg);
+}
+
+.anneau-fond {
+    fill: none;
+    stroke: rgba(44, 45, 34, 0.9);
+    stroke-width: 8;
+}
+
+.anneau-jauge {
+    fill: none;
+    stroke: var(--kaki-clair);
+    stroke-width: 8;
+    stroke-linecap: round;
+    filter: drop-shadow(0 0 6px rgba(180, 179, 137, 0.5));
+    transition: stroke-dashoffset 0.6s ease-out;
+}
+
+.anneau-pct {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    font-family: var(--police-titre);
+    font-size: 17px;
+}
+
+.anneau-nom {
+    margin-top: var(--espace-sm);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--texte-dim);
+}
+/* ===========================================================
+   Carte de streak : 7 pastilles L M M J V S D
+   =========================================================== */
+
+#streak-semaine {
+    display: flex;
+    gap: var(--espace-xs);
+    padding: var(--espace-md) var(--espace-sm);
+    margin-bottom: var(--espace-lg);
+    border-radius: var(--rayon);
+    background: linear-gradient(160deg, #1F2016, var(--surface));
+    border: 1px solid rgba(180, 179, 137, 0.10);
+}
+
+.streak-jour {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--espace-xs);
+}
+
+.streak-point {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(180, 179, 137, 0.25);
+    transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+.streak-point.rempli {
+    background: linear-gradient(180deg, var(--kaki-clair), var(--kaki));
+    border-color: transparent;
+    box-shadow: 0 0 10px rgba(180, 179, 137, 0.55);
+}
+
+.streak-lettre {
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    color: var(--texte-dim);
+}
+
+.streak-jour.aujourdhui .streak-point {
+    border-color: var(--accent);
+    border-width: 2px;
+}
+
+.streak-jour.aujourdhui .streak-lettre {
+    color: var(--accent);
+    font-weight: 700;
+}
