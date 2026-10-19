@@ -1061,3 +1061,56 @@ ul#seance-liste {
     width: 100%;
     margin-bottom: var(--espace-lg);
 }
+
+/* ===========================================================
+   Carte de streak : 7 pastilles L M M J V S D
+   =========================================================== */
+
+#streak-semaine {
+    display: flex;
+    gap: var(--espace-xs);
+    padding: var(--espace-md) var(--espace-sm);
+    margin-bottom: var(--espace-lg);
+    border-radius: var(--rayon);
+    background: linear-gradient(160deg, #1F2016, var(--surface));
+    border: 1px solid rgba(180, 179, 137, 0.10);
+}
+
+.streak-jour {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--espace-xs);
+}
+
+.streak-point {
+    display: block;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(180, 179, 137, 0.25);
+    transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+.streak-point.rempli {
+    background: linear-gradient(180deg, var(--kaki-clair), var(--kaki));
+    border-color: transparent;
+    box-shadow: 0 0 10px rgba(180, 179, 137, 0.55);
+}
+
+.streak-lettre {
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    color: var(--texte-dim);
+}
+
+.streak-jour.aujourdhui .streak-point {
+    border-color: var(--accent);
+    border-width: 2px;
+}
+
+.streak-jour.aujourdhui .streak-lettre {
+    color: var(--accent);
+    font-weight: 700;
+}
