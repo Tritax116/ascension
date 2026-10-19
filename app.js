@@ -26,6 +26,19 @@ function pad(n){
     return "" + n; 
 }
 
+function formaterDuree(minutes){
+    const totalSec = Math.round(minutes * 60);
+    if (totalSec < 60) {
+        return totalSec + " s";
+    }
+    const h = Math.floor(totalSec / 3600);
+    const min = Math.floor((totalSec % 3600) / 60);
+    if (h > 0) {
+        return h + " h " + pad(min);
+    }
+    return min + " min";
+}
+
 function todayStr(){
     const d = new Date();
     return d.getFullYear() + "-" + pad(d.getMonth() +1) + "-" + pad(d.getDate());
@@ -447,7 +460,7 @@ function renderCourse(){
         const i = indices[k];
         const c = etat.course[i];
         const ligne = document.createElement("li");
-        ligne.textContent = (c.favori ? "★ " : "") + c.distance.toFixed(2) + " km - " + Math.round(c.duree) + " min - " + c.date + " ";
+                ligne.textContent = (c.favori ? "★ " : "") + c.distance.toFixed(2) + " km - " + formaterDuree(c.duree) + " - " + c.date + " ";
         const btnFav = document.createElement("button");
         btnFav.textContent = c.favori ? "★" : "☆";
         btnFav.className = "btn-suppr";
@@ -616,24 +629,28 @@ function afficherDetailMuscle(muscle, e){
     document.getElementById("detail-rang").textContent = rang.nom + " " + rang.division;
     const liste = document.getElementById("detail-exos");
     liste.innerHTML = "";
+
     const prs = {};
-for (let i = 0; i < etat.muscu.length; i++) {
-    if (etat.muscu[i].muscle === muscle) {
-        const nom = etat.muscu[i].nom;
-        const poids = Number(etat.muscu[i].poids);
-        if (prs[nom] === undefined || poids > prs[nom]) {
-            prs[nom] = poids;
+    for (let i = 0; i < etat.muscu.length; i++) {
+        if (etat.muscu[i].muscle === muscle) {
+            const nom = etat.muscu[i].nom;
+            const poids = Number(etat.muscu[i].poids);
+            if (prs[nom] === undefined || poids > prs[nom]) {
+                prs[nom] = poids;
+            }
         }
     }
+
+    for (const nom in prs) {
+        const ligne = document.createElement("li");
+        ligne.textContent = nom + " — PR : " + prs[nom] + " kg";
+        liste.appendChild(ligne);
+    }
+
     filtreMuscle = muscle;
-renderMuscu();
+    renderMuscu();
 }
-for (const nom in prs) {
-    const ligne = document.createElement("li");
-    ligne.textContent = nom + " — PR : " + prs[nom] + " kg";
-    liste.appendChild(ligne);
-}
-}
+
 
 const zonesMuscle = document.querySelectorAll("[data-muscle]");
 for (let i = 0; i < zonesMuscle.length; i++) {
@@ -1039,7 +1056,7 @@ function terminerSeance(){
     for (let i = 0; i < seanceEnCours.series.length; i++) {
         volume += seanceEnCours.series[i].poids * seanceEnCours.series[i].reps;
     }
-    const duree = Math.round((Date.now() - seanceEnCours.debut) / 60000);
+    const duree = (Date.now() - seanceEnCours.debut) / 60000;
     etat.seances.push({
         date: todayStr(),
         duree: duree,
@@ -1063,7 +1080,7 @@ function renderSeances(){
     for (let i = 0; i < etat.seances.length; i++) {
         const s = etat.seances[i];
         const li = document.createElement("li");
-        li.textContent = s.date + " — " + s.duree + " min — " + s.volume + " kg — " + s.series.length + " séries";
+                li.textContent = s.date + " — " + formaterDuree(s.duree) + " — " + s.volume + " kg — " + s.series.length + " séries";
         liste.appendChild(li);
     }
 }
