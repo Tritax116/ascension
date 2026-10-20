@@ -145,7 +145,8 @@ document.getElementById("input-poids-perso").addEventListener("change", setPoids
 document.getElementById("btn-mesurer-mobilite").addEventListener("click", mesurerMobilite);
 document.getElementById("btn-demarrer-seance").addEventListener("click", demarrerSeance);
 document.getElementById("btn-abandonner-seance").addEventListener("click", abandonnerSeance);
-document.getElementById("btn-ajouter-exo").addEventListener("click", ajouterSerie);
+document.getElementById("btn-ajouter-exo").addEventListener("click", ouvrirSelecteur);
+document.getElementById("btn-fermer-selecteur").addEventListener("click", fermerSelecteur);
 document.getElementById("btn-terminer-seance").addEventListener("click", terminerSeance);
 document.getElementById("btn-toggle-vue").addEventListener("click", toggleVue);
 document.getElementById("btn-nutri-chercher").addEventListener("click", chercherAliment);
@@ -940,6 +941,15 @@ function messageCoach() {
     if (etat.streak === 0) return "Nouveau départ. Aujourd'hui ! tu reprends le contrôle.";
     return "Ta quête t'attend. Ne la laisse pas la journée filer.";
 }
+function ouvrirSelecteur(){
+    document.getElementById("selecteur-recherche").value = "";
+    document.getElementById("selecteur-exercice").hidden = false;
+}
+
+function fermerSelecteur(){
+    document.getElementById("selecteur-exercice").hidden = true;
+}
+
 function renderStreak() {
     const conteneur = document.getElementById("streak-semaine");
     conteneur.innerHTML = "";

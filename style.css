@@ -78,30 +78,6 @@ body::before{
         radial-gradient(55% 40% at 88% 12%, rgba(242, 199, 68, 0.10), transparent 70%);
 }
 
-#calendar {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--espace-xs);
-}
-
-.jour{
-    width: 14px;
-    height: 14px;
-    background-color: #2C2D22;
-    border-radius: 3px;
-}
-
-.niveau1{
-    background-color: #8C8B5E;
-}
-.niveau2{
-    background-color: #F2C744;
-}
-
-.aujourdhui{
-    border: 2px solid #F2F1E8;
-}
-
 button{
     background-color: #8C8B5E;
     color: #101109;
@@ -643,27 +619,6 @@ h1{
     font-style: italic;
 }
 
-#jours-semaine {
-    display: flex;
-    gap: var(--espace-sm);
-    margin-bottom: var(--espace-lg);
-    overflow-x: auto;
-}
-
-.jour-chip{
-    flex: 0 0 auto;
-    padding: var(--espace-sm) var(--espace-md);
-    border-radius: var(--rayon);
-    background-color: var(--surface-2);
-    color: var(--texte-dim);
-    font-size: var(--texte-label);
-}
-
-.jour-chip.actif {
-    background-color: var(--kaki);
-    color: var(--bg);
-}
-
 .mode-liste #hero,
 .mode-liste #streak-semaine,
 .mode-liste #message-coach {
@@ -774,9 +729,7 @@ h3 {
 .onglet-label,
 .cal-label,
 #legende-muscles,
-.jour-chip,
-#avatar-next,
-#rang-score {
+#avatar-next {
     font-family: var(--police-texte);
 }
 
@@ -887,13 +840,6 @@ h3 {
     color: var(--kaki-clair);
     border-left: 2px solid var(--kaki);
     padding-left: var(--espace-md);
-}
-
-.jour-chip {
-    letter-spacing: 0.02em;
-}
-.jour-chip.actif {
-    box-shadow: 0 0 14px rgba(140, 139, 94, 0.5);
 }
 
 ul#liste-exercice,
@@ -1113,4 +1059,124 @@ ul#seance-liste {
 .streak-jour.aujourdhui .streak-lettre {
     color: var(--accent);
     font-weight: 700;
+}
+
+/* ===========================================================
+   Selecteur d'exercice : surcouche plein ecran
+   =========================================================== */
+
+#selecteur-exercice {
+    position: fixed;
+    inset: 0;
+    z-index: 300;
+    display: flex;
+    flex-direction: column;
+    gap: var(--espace-md);
+    padding: var(--espace-lg);
+    padding-top: calc(var(--espace-lg) + env(safe-area-inset-top));
+    padding-bottom: calc(var(--espace-lg) + env(safe-area-inset-bottom));
+    background: rgba(7, 7, 6, 0.94);
+    backdrop-filter: var(--verre-flou);
+    -webkit-backdrop-filter: var(--verre-flou);
+    overflow-y: auto;
+}
+
+/* INDISPENSABLE : une regle display: flex ecrase l'attribut hidden.
+   Sans cette ligne, le selecteur resterait visible en permanence. */
+#selecteur-exercice[hidden] {
+    display: none;
+}
+
+#selecteur-entete {
+    display: flex;
+    align-items: center;
+    gap: var(--espace-md);
+}
+
+#selecteur-entete span {
+    font-family: var(--police-titre);
+    font-size: var(--texte-h2);
+}
+
+#selecteur-recherche {
+    width: 100%;
+    box-sizing: border-box;
+    padding: var(--espace-md);
+    border-radius: var(--rayon);
+    border: 1px solid var(--verre-bordure);
+    background: var(--surface);
+    color: var(--texte);
+    font-family: var(--police-texte);
+    font-size: var(--texte-corps);
+}
+
+#selecteur-recherche::placeholder {
+    color: var(--texte-dim);
+}
+
+#selecteur-recherche:focus {
+    outline: none;
+    border-color: var(--kaki);
+    box-shadow: 0 0 0 3px rgba(140, 139, 94, 0.18);
+}
+
+#selecteur-filtres {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--espace-sm);
+}
+
+.filtre-puce {
+    background-color: var(--surface-2);
+    color: var(--texte-dim);
+    border: none;
+    padding: var(--espace-sm) var(--espace-md);
+    border-radius: 999px;
+    font-family: var(--police-texte);
+    font-size: var(--texte-label);
+    cursor: pointer;
+}
+
+.filtre-puce.actif {
+    background-color: var(--kaki);
+    color: var(--bg);
+}
+
+#selecteur-liste {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex: 1;
+}
+
+.exo-ligne {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--espace-md);
+    padding: var(--espace-md) var(--espace-sm);
+    border-bottom: 1px solid rgba(180, 179, 137, 0.08);
+    cursor: pointer;
+}
+
+.exo-ligne:active {
+    background: rgba(140, 139, 94, 0.12);
+}
+
+.exo-nom {
+    font-size: var(--texte-corps);
+}
+
+.exo-meta {
+    font-size: var(--texte-label);
+    color: var(--texte-dim);
+}
+
+.selecteur-section {
+    list-style: none;
+    margin-top: var(--espace-lg);
+    font-size: var(--texte-label);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--texte-dim);
 }

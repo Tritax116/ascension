@@ -301,8 +301,20 @@
     <button id="btn-terminer-seance" class="btn-primaire">Terminer</button>
     <button id="btn-abandonner-seance" class="btn-tertiaire">Abandonner</button>
 </div>
-            </div>      
+            </div>  
+        <script src="exercices.js"></script>    
         <script src="app.js"></script>
+        
+        <div id="selecteur-exercice" hidden>
+            <div id="selecteur-entete">
+                <button id="btn-fermer-selecteur" class="btn-tertiaire">Annuler</button>
+                <span>Choisir un exercice</span>
+            </div>
+            <input id="selecteur-recherche" type="text" placeholder="Rechercher un exercice...">
+            <div id="selecteur-filtres"></div>
+            <ul id="selecteur-liste"></ul>
+        </div>
+
         <div id="celebration" hidden>
             <div id="celebration-contenu">
                 <p id="celebration-message"></p>

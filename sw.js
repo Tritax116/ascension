@@ -7,7 +7,8 @@ const FICHIERS = [
     "icon-512.png",
     "fonts/morhefa-400.woff2",
     "fonts/morhefa-500.woff2",
-    "fonts/morhefa-700.woff2"
+    "fonts/morhefa-700.woff2",
+    "exercices.js",
 ];
 
 self.addEventListener("install", function(e){
