@@ -1180,3 +1180,358 @@ ul#seance-liste {
     letter-spacing: 0.08em;
     color: var(--texte-dim);
 }
+
+/* ---------- Seance : exercices et tableau de series ---------- */
+
+#seance-liste .seance-exo {
+    display: block;
+    padding: var(--espace-lg) 0 var(--espace-md);
+}
+
+.seance-exo-nom {
+    font-family: var(--police-titre);
+    font-size: 1.15rem;
+    color: var(--accent);
+    margin-bottom: var(--espace-md);
+}
+
+.serie-ligne {
+    display: grid;
+    grid-template-columns: 2rem 3.5rem 1fr 1fr 2.5rem;
+    gap: var(--espace-sm);
+    align-items: center;
+    padding: 6px var(--espace-sm);
+    margin-bottom: 6px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.03);
+    transition: background 0.2s;
+}
+
+.serie-ligne > span:first-child {
+    text-align: center;
+    font-family: var(--police-titre);
+    color: var(--texte-dim);
+}
+
+.serie-precedent {
+    text-align: center;
+    font-size: var(--texte-label);
+    color: var(--texte-dim);
+}
+
+.serie-ligne input {
+    width: 100%;
+    min-width: 0;
+    height: 40px;
+    text-align: center;
+    font-family: var(--police-titre);
+    font-size: 1.1rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--texte);
+    background: var(--bg);
+    border: 1px solid transparent;
+    border-radius: 10px;
+    -moz-appearance: textfield;
+}
+
+.serie-ligne input::-webkit-outer-spin-button,
+.serie-ligne input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.serie-ligne input:focus {
+    outline: none;
+    border-color: var(--kaki);
+}
+
+/* bouton valider : rond, vide puis plein une fois la serie faite */
+.serie-valider {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    margin: 0 auto;
+    border-radius: 50%;
+    font-size: 1rem;
+    color: var(--texte-dim);
+    background: transparent;
+    border: 1.5px solid var(--bordure);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.serie-ligne.fait {
+    background: rgba(140, 139, 94, 0.16);
+}
+
+.serie-ligne.fait input {
+    color: var(--kaki-clair);
+}
+
+.serie-ligne.fait .serie-valider {
+    background: var(--kaki);
+    border-color: var(--kaki);
+    color: var(--bg);
+}
+
+#seance-liste .btn-ajouter-serie {
+    width: 100%;
+    margin-top: var(--espace-xs);
+    padding: var(--espace-sm);
+    font-size: var(--texte-label);
+    color: var(--kaki-clair);
+    border: 1px dashed var(--bordure);
+    border-radius: 12px;
+}
+
+/* ===========================================================
+   FINITION : coherence visuelle de toutes les pages
+   (couche ajoutee a la fin : elle complete, elle ne remplace rien)
+   =========================================================== */
+
+/* ---------- Champs de saisie : un seul style partout ----------
+   :where() = specificite zero, donc les champs specifiques
+   (.serie-ligne input, #selecteur-recherche) gardent la main. */
+:where(input[type="text"], input[type="number"], select) {
+    box-sizing: border-box;
+    padding: var(--espace-md);
+    border-radius: 10px;
+    border: 1px solid var(--verre-bordure);
+    background: var(--surface);
+    color: var(--texte);
+    font-family: var(--police-texte);
+    font-size: var(--texte-corps);
+}
+
+:where(input[type="text"], input[type="number"], select):focus {
+    outline: none;
+    border-color: var(--kaki);
+    box-shadow: 0 0 0 3px rgba(140, 139, 94, 0.18);
+}
+
+/* ---------- Titres de page ---------- */
+.page > h2:first-child {
+    margin-top: 0;
+}
+
+/* ---------- Boutons : zones d'action pleine largeur ---------- */
+#btn-demarrer-seance,
+#btn-mesurer-mobilite,
+#page-course .btn-primaire,
+#page-course .btn-secondaire {
+    display: block;
+    width: 100%;
+    margin-bottom: var(--espace-md);
+}
+
+#page-course button[hidden] {
+    display: none;
+}
+
+/* ---------- Muscu ---------- */
+.vues-muscle {
+    display: flex;
+    justify-content: center;
+    gap: var(--espace-sm);
+    margin: var(--espace-lg) 0 var(--espace-md);
+}
+
+.stage-muscle {
+    margin: 0 auto;
+}
+
+#legende-muscles {
+    justify-content: center;
+    margin-top: var(--espace-lg);
+}
+
+/* ---------- Page seance ---------- */
+
+#seance-entete {
+    display: flex;
+    justify-content: space-around;
+    align-items: baseline;
+    padding: var(--espace-lg) var(--espace-md);
+    margin-bottom: var(--espace-lg);
+    border-radius: var(--rayon);
+    background: linear-gradient(160deg, #1F2016, var(--surface));
+    border: 1px solid rgba(180, 179, 137, 0.10);
+    box-shadow: var(--ombre);
+}
+
+#seance-duree {
+    font-size: var(--texte-hero);
+    color: var(--accent);
+}
+
+#seance-volume,
+#seance-series {
+    font-size: var(--texte-h2);
+    color: var(--texte);
+}
+
+#btn-ajouter-exo {
+    display: block;
+    width: 100%;
+    margin-top: var(--espace-sm);
+}
+
+#btn-terminer-seance {
+    display: block;
+    width: 100%;
+    margin-top: var(--espace-xl);
+}
+
+#btn-abandonner-seance {
+    display: block;
+    margin: var(--espace-sm) auto 0;
+    color: var(--erreur);
+}
+
+/* ---------- Nutrition ---------- */
+.nutri-recherche {
+    display: flex;
+    gap: var(--espace-sm);
+}
+
+.nutri-recherche input {
+    flex: 1;
+    min-width: 0;
+}
+
+#btn-hydra {
+    background: transparent;
+    color: var(--kaki-clair);
+    border: 1px solid var(--kaki);
+    min-height: 44px;
+    margin: var(--espace-sm) 0;
+}
+
+#nutri-macros {
+    font-size: var(--texte-label);
+    color: var(--texte-dim);
+}
+
+/* ---------- Mobilite ---------- */
+.test-mobilite {
+    padding: var(--espace-md);
+    border-radius: var(--rayon);
+    background: var(--surface);
+    border: 1px solid rgba(180, 179, 137, 0.10);
+}
+
+.test-mobilite .selecteur {
+    justify-content: space-between;
+}
+
+.test-mobilite .btn-note {
+    flex: 1;
+}
+
+#btn-echauffement,
+#btn-etirement {
+    margin: 0 var(--espace-sm) var(--espace-md) 0;
+}
+
+#mob-score {
+    font-size: var(--texte-h2);
+    color: var(--accent);
+}
+
+/* ---------- Profil ---------- */
+#fiche-perso label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--espace-md);
+    color: var(--texte-dim);
+}
+
+#fiche-perso input {
+    width: 110px;
+    text-align: center;
+}
+
+#fiche-classe,
+#fiche-titre {
+    color: var(--kaki-clair);
+}
+
+/* ---------- Seance : en-tete des colonnes et minuteur de repos ---------- */
+
+/* Meme grille que .serie-ligne, pour que les titres tombent pile au-dessus */
+.serie-entete {
+    display: grid;
+    grid-template-columns: 2rem 3.5rem 1fr 1fr 2.5rem;
+    gap: var(--espace-sm);
+    padding: 0 var(--espace-sm);
+    margin-bottom: var(--espace-xs);
+    text-align: center;
+    font-family: var(--police-texte);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--texte-dim);
+}
+
+#seance-repos {
+    font-family: var(--police-titre);
+    font-size: var(--texte-h2);
+    font-variant-numeric: tabular-nums;
+    color: var(--succes);
+}
+
+/* Le repos et le bouton de duree passent sur leur propre ligne.
+   min-height : la place est reservee, l'en-tete ne saute pas quand le repos demarre. */
+#seance-entete {
+    flex-wrap: wrap;
+    row-gap: var(--espace-sm);
+}
+
+#seance-repos {
+    order: 2;
+    flex-basis: 100%;
+    min-height: 1.5em;
+    text-align: center;
+}
+
+#btn-duree-repos {
+    order: 3;
+    min-height: 0;
+    padding: var(--espace-xs) var(--espace-md);
+    font-size: var(--texte-label);
+    border: 1px solid var(--bordure);
+    border-radius: 999px;
+}
+
+/* Titre de l'exercice + croix pour le retirer */
+.seance-exo-tete {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--espace-md);
+}
+
+.seance-exo-tete .seance-exo-nom {
+    margin-bottom: 0;
+}
+
+.seance-exo-tete .btn-suppr {
+    min-height: 36px;
+    min-width: 36px;
+    padding: 0;
+    color: var(--texte-dim);
+}
+
+/* Le numero de serie est un bouton : toucher le numero propose de supprimer */
+.serie-num {
+    width: 100%;
+    padding: 0;
+    min-height: 36px;
+    background: transparent;
+    color: var(--texte-dim);
+    font-family: var(--police-titre);
+    font-size: var(--texte-corps);
+    font-weight: 400;
+}

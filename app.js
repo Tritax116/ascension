@@ -12,7 +12,10 @@ let marqueur = null;
 let enPause = false;
 let pauseDebut = null;
 let filtreMuscle = null;
-let seanceEnCours = null;
+let seanceEnCours = JSON.parse(localStorage.getItem("seanceEnCours")) || null;
+let finRepos = 0;
+const DUREES_REPOS = [60, 90, 120, 180];
+let dureeRepos = Number(localStorage.getItem("dureeRepos")) || 90;
 
 
 
@@ -941,13 +944,58 @@ function messageCoach() {
     if (etat.streak === 0) return "Nouveau départ. Aujourd'hui ! tu reprends le contrôle.";
     return "Ta quête t'attend. Ne la laisse pas la journée filer.";
 }
-function ouvrirSelecteur(){
-    document.getElementById("selecteur-recherche").value = "";
-    document.getElementById("selecteur-exercice").hidden = false;
-}
-
 function fermerSelecteur(){
     document.getElementById("selecteur-exercice").hidden = true;
+}
+
+function renderSelecteur() {
+    const liste = document.getElementById("selecteur-liste");
+    liste.innerHTML = "";
+
+    const favoris = EXERCICES.filter(function(e){ return e.favori; });
+    const autres = EXERCICES.filter(function(e){return !e.favori; });
+
+    ajouterSection(liste, "Favoris", favoris);
+    ajouterSection(liste, "Tous les exercices", autres);
+}
+
+function ajouterSection(liste, titre, exercices) {
+    if (exercices.length === 0) {
+        return;
+    }
+    const entete = document.createElement("li");
+    entete.className = "selecteur-section";
+    entete.textContent = titre;
+    liste.appendChild(entete);
+
+    for (let i = 0; i < exercices.length; i++) {
+        const ex = exercices[i];
+        
+        const ligne = document.createElement("li");
+        ligne.className = "exo-ligne";
+
+        const nom = document.createElement("span");
+        nom.className = "exo-nom";
+        nom.textContent = ex.nom;
+
+        const meta = document.createElement("span");
+        meta.className = "exo-meta";
+        meta.textContent = NOMS_MUSCLES[ex.muscle] + " · " + NOMS_MATERIEL[ex.materiel];
+
+        ligne.appendChild(nom);
+        ligne.appendChild(meta);
+        ligne.addEventListener("click", function() {
+
+            choisirExercice(ex);
+        });
+        liste.appendChild(ligne);
+    }
+}
+
+function ouvrirSelecteur(){
+    document.getElementById("selecteur-recherche").value ="";
+    renderSelecteur();
+    document.getElementById("selecteur-exercice").hidden = false;
 }
 
 function renderStreak() {
@@ -983,63 +1031,193 @@ function renderStreak() {
     }
 }
 function demarrerSeance() {
-    seanceEnCours = { debut: Date.now(), series: [] };
+    if (seanceEnCours) {
+        changerPage("seance");
+        return;
+    }
+    seanceEnCours = {
+        debut: Date.now(),
+        exercices: []
+    };
+    sauverSeance();
     changerPage("seance");
+}
+
+function choisirExercice(ex) {
+    seanceEnCours.exercices.push({
+        id: ex.id,
+        nom: ex.nom,
+        muscle: ex.muscle,
+        series: []
+    });
+    fermerSelecteur();
+    renderSeance();
+}
+
+function ajouterSerieExo(indexExo) {
+    seanceEnCours.exercices[indexExo].series.push({
+        kg: "",
+        reps: "",
+        fait: false
+    });
+    renderSeance();
+}
+
+function supprimerSerie(indexExo, indexSerie) {
+    if (!confirm("Supprimer la série " + (indexSerie + 1) + " ?")) {
+        return;
+    }
+    seanceEnCours.exercices[indexExo].series.splice(indexSerie, 1);
+    renderSeance();
+}
+
+function supprimerExercice(indexExo) {
+    const exo = seanceEnCours.exercices[indexExo];
+    if (!confirm("Retirer " + exo.nom + " de la séance ?")) {
+        return;
+    }
+    seanceEnCours.exercices.splice(indexExo, 1);
+    renderSeance();
+}
+
+function changerDureeRepos() {
+    const position = DUREES_REPOS.indexOf(dureeRepos);
+    dureeRepos = DUREES_REPOS[(position + 1) % DUREES_REPOS.length];
+    localStorage.setItem("dureeRepos", dureeRepos);
+    renderSeance();
 }
 
 function abandonnerSeance() {
     seanceEnCours = null;
+    finRepos = 0;
+    sauverSeance();
     changerPage("muscu");
-}
-
-function ajouterSerie() {
-    const nom = document.getElementById("seance-exo").value;
-    const muscle = document.getElementById("seance-muscle").value;
-    const poids = document.getElementById("seance-poids").value;
-    const reps = document.getElementById("seance-reps").value;
-    if (nom === "" || poids === "" || reps === "") {
-        return;
-    }
-    seanceEnCours.series.push({ nom: nom, muscle: muscle, poids: Number(poids), reps: Number(reps) });
-    document.getElementById("seance-poids").value = "";
-    document.getElementById("seance-reps").value = "";
-    document.getElementById("seance-exo").focus();
-    renderSeance();
 }
 
 function renderSeance() {
     if (!seanceEnCours) {
         return;
     }
+    sauverSeance();
     const liste = document.getElementById("seance-liste");
     liste.innerHTML = "";
     let volume = 0;
-    const groupes = {};
-    const ordre = [];
-    for (let i = 0; i < seanceEnCours.series.length; i++) {
-        const s = seanceEnCours.series[i];
-        volume += s.poids * s.reps;
-        if (!groupes[s.nom]) {
-            groupes[s.nom] = [];
-            ordre.push(s.nom);
+    let nbSeries = 0;
+
+    for (let i = 0; i < seanceEnCours.exercices.length; i++) {
+        const exo = seanceEnCours.exercices[i];
+
+        const bloc = document.createElement("li");
+        bloc.className = "seance-exo";
+
+        const tete = document.createElement("div");
+        tete.className = "seance-exo-tete";
+
+        const titre = document.createElement("div");
+        titre.className = "seance-exo-nom";
+        titre.textContent = exo.nom;
+
+        const btnSuppr = document.createElement("button");
+        btnSuppr.className = "btn-suppr";
+        btnSuppr.textContent = "✕";
+        btnSuppr.setAttribute("aria-label", "Retirer l'exercice");
+        btnSuppr.addEventListener("click", function() {
+            supprimerExercice(i);
+        });
+
+        tete.appendChild(titre);
+        tete.appendChild(btnSuppr);
+        bloc.appendChild(tete);
+
+        if (exo.series.length > 0) {
+            const entete = document.createElement("div");
+            entete.className = "serie-entete";
+            const titres = ["Série", "Préc.", "kg", "Reps", ""];
+            for (let k = 0; k < titres.length; k++) {
+                const cellule = document.createElement("span");
+                cellule.textContent = titres[k];
+                entete.appendChild(cellule);
+            }
+            bloc.appendChild(entete);
         }
-        groupes[s.nom].push(s);
-    }
-    for (let g = 0; g < ordre.length; g++) {
-        const nomExo = ordre[g];
-        const titre = document.createElement("li");
-        titre.textContent = nomExo;
-        titre.style.fontWeight = "bold";
-        liste.appendChild(titre);
-        for (let j = 0; j < groupes[nomExo].length; j++) {
-            const s = groupes[nomExo][j];
-            const li = document.createElement("li");
-            li.textContent = "Série " + (j + 1) + " : " + s.poids + "kg x " + s.reps;
-            liste.appendChild(li);
+
+        for (let j = 0; j < exo.series.length; j++) {
+            const serie = exo.series[j];
+            if (serie.fait) {
+                volume += Number(serie.kg) * Number(serie.reps);
+                nbSeries++;
+            }
+
+            const ligne = document.createElement("div");
+            ligne.className = "serie-ligne";
+
+            const numero = document.createElement("button");
+            numero.className = "serie-num";
+            numero.textContent = j + 1;
+            numero.setAttribute("aria-label", "Supprimer la série " + (j + 1));
+            numero.addEventListener("click", function() {
+                supprimerSerie(i, j);
+            });
+
+            const precedent = document.createElement("span");
+            precedent.className = "serie-precedent";
+            precedent.textContent = "–";
+
+            const champKg = document.createElement("input");
+            champKg.type = "number";
+            champKg.inputMode = "decimal";
+            champKg.value = serie.kg;
+            champKg.addEventListener("input", function() {
+                serie.kg = champKg.value;
+                sauverSeance();
+            });
+
+            const champReps = document.createElement("input");
+            champReps.type = "number";
+            champReps.inputMode = "numeric";
+            champReps.value = serie.reps;
+            champReps.addEventListener("input", function() {
+                serie.reps = champReps.value;
+                sauverSeance();
+            });
+
+            const valider = document.createElement("button");
+            valider.className = "serie-valider";
+            valider.textContent = "✓";
+            if (serie.fait) {
+                ligne.classList.add("fait");
+            }
+            valider.addEventListener("click", function() {
+                serie.fait = !serie.fait;
+                if (serie.fait) {
+                    finRepos = Date.now() + dureeRepos * 1000;
+                } else {
+                    finRepos = 0;
+                }
+                renderSeance();
+            });
+
+            ligne.appendChild(numero);
+            ligne.appendChild(precedent);
+            ligne.appendChild(champKg);
+            ligne.appendChild(champReps);
+            ligne.appendChild(valider);
+            bloc.appendChild(ligne);
         }
+
+        const btn = document.createElement("button");
+        btn.className = "btn-tertiaire btn-ajouter-serie";
+        btn.textContent = "+ Ajouter une série";
+        btn.addEventListener("click", function() {
+            ajouterSerieExo(i);
+        });
+        bloc.appendChild(btn);
+
+        liste.appendChild(bloc);
     }
     document.getElementById("seance-volume").textContent = volume + " kg";
-    document.getElementById("seance-series").textContent = seanceEnCours.series.length + " séries";
+    document.getElementById("seance-series").textContent = nbSeries + (nbSeries > 1 ? " séries" : " série");
+    document.getElementById("btn-duree-repos").textContent = "⏱ " + dureeRepos + " s";
 }
 
 function majDureeSeance() {
@@ -1051,33 +1229,84 @@ function majDureeSeance() {
     const min = Math.floor(totalSec / 60);
     const sec = totalSec % 60;
     document.getElementById("seance-duree").textContent = pad(min) + ":" + pad(sec);
+
+    const zoneRepos = document.getElementById("seance-repos");
+    if (finRepos === 0) {
+        zoneRepos.textContent = "";
+        return;
+    }
+    const restant = Math.ceil((finRepos - Date.now()) / 1000);
+    if (restant > 0) {
+        zoneRepos.textContent = "Repos " + pad(Math.floor(restant / 60)) + ":" + pad(restant % 60);
+    } else {
+        zoneRepos.textContent = "";
+        finRepos = 0;
+        if (navigator.vibrate) {
+            navigator.vibrate([200, 100, 200]);
+        }
+    }
 }
 
 function terminerSeance() {
-    if (!seanceEnCours || seanceEnCours.series.length === 0) {
+    if (!seanceEnCours) {
         return;
     }
+
+    const series = [];
     let volume = 0;
-    for (let i = 0; i < seanceEnCours.series.length; i++) {
-        volume += seanceEnCours.series[i].poids * seanceEnCours.series[i].reps;
+
+    for (let i = 0; i < seanceEnCours.exercices.length; i++) {
+        const exo = seanceEnCours.exercices[i];
+        for (let j = 0; j < exo.series.length; j++) {
+            const s = exo.series[j];
+            if (s.fait) {
+                series.push({
+                    id: exo.id,
+                    nom: exo.nom,
+                    muscle: exo.muscle,
+                    poids: Number(s.kg),
+                    reps: Number(s.reps)
+                });
+                volume += Number(s.kg) * Number(s.reps);
+            }
+        }
     }
+
+    if (series.length === 0) {
+        alert("Valide au moins une série avec ✓ avant de terminer.");
+        return;
+    }
+
     const duree = (Date.now() - seanceEnCours.debut) / 60000;
     etat.seances.push({
         date: todayStr(),
         duree: duree,
         volume: volume,
-        series: seanceEnCours.series
+        series: series
     });
-    for (let i = 0; i < seanceEnCours.series.length; i++) {
-        const s = seanceEnCours.series[i];
-        etat.muscu.push({ nom: s.nom, poids: s.poids, reps: s.reps, muscle: s.muscle, date: todayStr() });
+    for (let i = 0; i < series.length; i++) {
+        const s = series[i];
+        etat.muscu.push({ id: s.id, nom: s.nom, poids: s.poids, reps: s.reps, muscle: s.muscle, date: todayStr() });
     }
     etat.xp += 40;
     seanceEnCours = null;
+    finRepos = 0;
+    sauverSeance();
     save();
     render();
     changerPage("muscu");
 }
+
+function sauverSeance() {
+    if (seanceEnCours) {
+        localStorage.setItem("seanceEnCours", JSON.stringify(seanceEnCours));
+    } else {
+        localStorage.removeItem("seanceEnCours");
+    }
+}
+
+document.getElementById("btn-duree-repos").addEventListener("click", changerDureeRepos);
+
 
 function renderSeances() {
     const liste = document.getElementById("seances-historique");
@@ -1343,4 +1572,9 @@ function ajouterRepas(nom, kcal100, prot100, gluc100, lip100) {
     document.getElementById("nutri-input").value = "";
     render();
     save();
+}
+
+if (seanceEnCours) {
+    renderSeance();
+    changerPage("seance");
 }
