@@ -1,7 +1,8 @@
-const CACHE = "ascension-v5";
+const CACHE = "ascension-v6";
 const FICHIERS = [
     "index.html",
     "style.css",
+    "theme-notion.css",
     "app.js",
     "icon-192.png",
     "icon-512.png",

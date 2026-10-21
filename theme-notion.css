@@ -1,0 +1,337 @@
+/* ===========================================================
+   Theme "Bonsai" : calme, terreux, qui respire.
+   (Le fichier garde le nom theme-notion.css pour ne pas casser le <link>.)
+
+   Chargee APRES style.css. Pour revenir a l'ancien design :
+   supprimer la ligne <link> de ce fichier dans index.html.
+
+   Principes : un fond vert-noir chaud, des tons mousse et ecorce,
+   texte papier, coins genereux, aucun degrade ni lueur,
+   transitions lentes, titres en serif discret.
+   =========================================================== */
+
+:root {
+    /* Terre et mousse */
+    --bg: #12130E;
+    --surface: #1A1C14;
+    --surface-2: #252920;
+    --texte: #E7E3D3;
+    --texte-dim: #8F8D7A;
+    --bordure: rgba(231, 227, 211, 0.14);
+
+    --kaki: #8E9A62;
+    --kaki-fonce: #626D40;
+    --kaki-clair: #B9C48A;
+    --accent: #C8C58D;
+    --succes: #8FAE6B;
+    --erreur: #BF6F58;
+    --warning: #C99A55;
+
+    --rayon: 16px;
+    --ombre: none;
+    --verre-fond: rgba(26, 28, 20, 0.92);
+    --verre-bordure: rgba(231, 227, 211, 0.08);
+    --verre-flou: blur(10px);
+
+    /* Titres en serif discret, chiffres cles en Morhefa */
+    --police-titre: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    --police-chiffres: "Morhefa", system-ui, sans-serif;
+
+    --texte-h1: 26px;
+    --texte-h2: 20px;
+    --texte-label: 12px;
+}
+
+/* ---------- Fond : une seule teinte, tres douce ---------- */
+body::before {
+    background: radial-gradient(70% 40% at 50% 0%, rgba(142, 154, 98, 0.07), transparent 70%);
+}
+
+body {
+    line-height: 1.6;
+    padding-top: 72px;
+}
+
+/* ---------- Titres : serif, sans majuscules criardes ---------- */
+h1, h2, h3 {
+    letter-spacing: 0;
+    font-family: var(--police-titre);
+}
+
+h2 {
+    font-weight: 600;
+    font-size: var(--texte-h1);
+    margin-bottom: var(--espace-lg);
+}
+
+h3 {
+    text-transform: none;
+    letter-spacing: 0.01em;
+    font-size: 15px;
+    font-weight: 500;
+    font-style: italic;
+    color: var(--texte-dim);
+    margin-top: var(--espace-2xl);
+}
+
+/* ---------- Morhefa : uniquement les chiffres cles et le rang ---------- */
+#app-nom,
+#level-badge,
+.compteur-valeur,
+.anneau-pct,
+#seance-duree,
+#celebration-message {
+    font-family: var(--police-chiffres);
+}
+
+/* ---------- En-tete ---------- */
+#app-header {
+    background: rgba(18, 19, 14, 0.9);
+    border-bottom: 1px solid var(--verre-bordure);
+}
+
+#app-nom {
+    letter-spacing: 0.06em;
+    color: var(--kaki-clair);
+}
+
+/* ---------- Bulle de navigation : conservee, adoucie ---------- */
+#nav-onglets {
+    background: var(--verre-fond);
+    border: 1px solid var(--verre-bordure);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+}
+
+.onglet {
+    transition: color 0.4s ease, background 0.4s ease;
+}
+
+.onglet.actif {
+    color: var(--kaki-clair);
+    background: rgba(142, 154, 98, 0.16);
+}
+
+/* ---------- Cartes : aplat, coins genereux, trait fin ---------- */
+#hero,
+#streak-semaine,
+#quete-du-jour,
+#hydratation,
+.nutri-resume,
+.compteur,
+.course-stats,
+.anneau,
+.test-mobilite,
+#seance-entete,
+#detail-muscle,
+#celebration-contenu {
+    background: var(--surface);
+    border: 1px solid var(--verre-bordure);
+    border-radius: var(--rayon);
+    box-shadow: none;
+}
+
+#celebration-contenu {
+    border-color: var(--kaki);
+}
+
+/* ---------- Boutons : doux et ronds ---------- */
+.btn-primaire {
+    background: var(--kaki);
+    color: #12130E;
+    border-radius: 999px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+}
+
+.btn-secondaire {
+    background: transparent;
+    border: 1px solid var(--bordure);
+    color: var(--kaki-clair);
+    border-radius: 999px;
+    font-weight: 500;
+}
+
+.btn-tertiaire {
+    color: var(--texte-dim);
+}
+
+#btn-abandonner-seance {
+    color: var(--erreur);
+}
+
+.vue-muscle,
+.filtre-puce {
+    border-radius: 999px;
+}
+
+.vue-muscle.on,
+.filtre-puce.actif,
+.btn-note.actif {
+    background: rgba(142, 154, 98, 0.22);
+    color: var(--kaki-clair);
+}
+
+/* ---------- Champs ---------- */
+:where(input[type="text"], input[type="number"], select),
+#selecteur-recherche {
+    background: var(--surface);
+    border: 1px solid var(--verre-bordure);
+    border-radius: 12px;
+}
+
+:where(input[type="text"], input[type="number"], select):focus,
+#selecteur-recherche:focus {
+    border-color: var(--kaki);
+    box-shadow: 0 0 0 3px rgba(142, 154, 98, 0.16);
+}
+
+#selecteur-exercice {
+    background: rgba(18, 19, 14, 0.97);
+}
+
+/* ---------- Barres, anneaux, pastilles : mousse, sans lueur ---------- */
+.module-barre,
+.quete-barre,
+#xp-bar,
+#hero #xp-bar {
+    height: 6px;
+    border-radius: 999px;
+    background-color: var(--surface-2);
+}
+
+.module-fill,
+.quete-fill,
+#hydra-fill,
+#xp-fill,
+#hero #xp-fill {
+    border-radius: 999px;
+    box-shadow: none;
+    background: var(--kaki) !important;
+    transition: width 0.6s ease;
+}
+
+.anneau-jauge {
+    filter: none;
+    stroke: var(--kaki);
+}
+
+.anneau-fond {
+    stroke: var(--surface-2);
+}
+
+.streak-point.rempli {
+    background: var(--kaki);
+    box-shadow: none;
+}
+
+.streak-jour.aujourdhui .streak-point {
+    border-color: var(--kaki-clair);
+}
+
+.streak-jour.aujourdhui .streak-lettre {
+    color: var(--kaki-clair);
+}
+
+#message-coach {
+    font-family: var(--police-titre);
+    font-style: italic;
+    border-left: 2px solid var(--kaki-fonce);
+    color: var(--kaki-clair);
+}
+
+/* ---------- Listes : separees par un trait fin ---------- */
+#liste-exercice li,
+#seances-historique li,
+#liste-courses li,
+#mob-historique li,
+#liste-badges li,
+#nutri-repas li,
+#nutri-resultats li,
+#routine-liste li,
+.exo-ligne {
+    border-bottom: 1px solid var(--verre-bordure);
+}
+
+.exo-ligne:active,
+#nutri-resultats li:active {
+    background: rgba(142, 154, 98, 0.10);
+}
+
+.selecteur-section {
+    text-transform: none;
+    letter-spacing: 0.01em;
+    font-family: var(--police-titre);
+    font-style: italic;
+    font-size: 14px;
+}
+
+/* ---------- Seance : tableau de series ---------- */
+#seance-entete {
+    padding: var(--espace-lg);
+}
+
+#seance-duree {
+    color: var(--kaki-clair);
+}
+
+.seance-exo-nom {
+    font-family: var(--police-titre);
+    font-weight: 600;
+    font-size: 18px;
+    color: var(--texte);
+}
+
+.serie-ligne {
+    background: transparent;
+    border-radius: 12px;
+}
+
+.serie-ligne > span:first-child,
+.serie-num {
+    font-family: var(--police-titre);
+}
+
+.serie-ligne input {
+    background: var(--surface-2);
+    border: none;
+    border-radius: 10px;
+    font-family: var(--police-chiffres);
+}
+
+.serie-ligne input:focus {
+    box-shadow: 0 0 0 2px rgba(142, 154, 98, 0.45);
+}
+
+.serie-valider {
+    border-radius: 50%;
+    border: 1.5px solid var(--bordure);
+    transition: background 0.4s ease, border-color 0.4s ease;
+}
+
+.serie-ligne {
+    transition: background 0.4s ease;
+}
+
+.serie-ligne.fait {
+    background: rgba(142, 154, 98, 0.14);
+}
+
+.serie-ligne.fait .serie-valider {
+    background: var(--kaki);
+    border-color: var(--kaki);
+}
+
+#seance-liste .btn-ajouter-serie {
+    border: 1px dashed var(--bordure);
+    border-radius: 12px;
+    color: var(--texte-dim);
+}
+
+#seance-repos {
+    color: var(--succes);
+}
+
+#btn-duree-repos {
+    border-color: var(--bordure);
+    color: var(--texte-dim);
+}
