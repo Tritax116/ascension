@@ -12,6 +12,7 @@ let marqueur = null;
 let enPause = false;
 let pauseDebut = null;
 let filtreMuscle = null;
+let verrouEcran = null;
 let seanceEnCours = JSON.parse(localStorage.getItem("seanceEnCours")) || null;
 let finRepos = 0;
 const DUREES_REPOS = [60, 90, 120, 180];
@@ -155,6 +156,10 @@ document.getElementById("btn-toggle-vue").addEventListener("click", toggleVue);
 document.getElementById("btn-nutri-chercher").addEventListener("click", chercherAliment);
 document.getElementById("btn-echauffement").addEventListener("click", function () {
     afficherRoutine("echauffement");
+});
+const champRecherche = document.getElementById("selecteur-recherche");
+champRecherche.addEventListener("input", function() {
+    renderSelecteur(champRecherche.value);
 });
 document.getElementById("btn-etirement").addEventListener("click", function () {
     afficherRoutine("etirement");
@@ -948,12 +953,36 @@ function fermerSelecteur(){
     document.getElementById("selecteur-exercice").hidden = true;
 }
 
-function renderSelecteur() {
+function normaliser(texte) {
+    return texte 
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
+function renderSelecteur(recherche) {
     const liste = document.getElementById("selecteur-liste");
     liste.innerHTML = "";
 
+    const terme = normaliser(recherche || "");
+    if (terme !== "") {
+        const resultats = EXERCICES.filter(function(e) {
+            const texte = e.nom + " " + NOMS_MUSCLES[e.muscle] + " " + NOMS_MATERIEL[e.materiel];
+            return normaliser(texte).includes(terme);
+        });
+        if (resultats.length === 0) {
+            const vide = document.createElement("li");
+            vide.className = "selecteur-section";
+            vide.textContent = "Aucun résultat";
+            liste.appendChild(vide);
+            return;
+        }
+        ajouterSection(liste, "Résultats", resultats);
+        return;
+    }
+
     const favoris = EXERCICES.filter(function(e){ return e.favori; });
-    const autres = EXERCICES.filter(function(e){return !e.favori; });
+    const autres = EXERCICES.filter(function(e){ return !e.favori; });
 
     ajouterSection(liste, "Favoris", favoris);
     ajouterSection(liste, "Tous les exercices", autres);
@@ -1040,6 +1069,7 @@ function demarrerSeance() {
         exercices: []
     };
     sauverSeance();
+    garderEcranAllume();
     changerPage("seance");
 }
 
@@ -1090,6 +1120,7 @@ function changerDureeRepos() {
 function abandonnerSeance() {
     seanceEnCours = null;
     finRepos = 0;
+    relacherEcran();
     sauverSeance();
     changerPage("muscu");
 }
@@ -1291,6 +1322,7 @@ function terminerSeance() {
     etat.xp += 40;
     seanceEnCours = null;
     finRepos = 0;
+    relacherEcran();
     sauverSeance();
     save();
     render();
@@ -1304,6 +1336,39 @@ function sauverSeance() {
         localStorage.removeItem("seanceEnCours");
     }
 }
+
+async function garderEcranAllume() {
+    if (!("wakeLock" in navigator) || verrouEcran) {
+        return;
+    }
+    try {
+        verrouEcran = await navigator.wakeLock.request("screen");
+        verrouEcran.addEventListener("release", function() {
+            verrouEcran = null;
+        });
+    } catch (erreur) {
+        verrouEcran = null;
+    }
+}
+
+function relacherEcran() {
+    if (verrouEcran) {
+        verrouEcran.release();
+        verrouEcran = null;
+    }
+}
+
+if (seanceEnCours) {
+    garderEcranAllume();
+    renderSeance();
+    changerPage("seance");
+}
+
+document.addEventListener("visibilitychange", function() {
+    if (document.visibilityState === "visible" && seanceEnCours) {
+        garderEcranAllume();
+    }
+});
 
 document.getElementById("btn-duree-repos").addEventListener("click", changerDureeRepos);
 
