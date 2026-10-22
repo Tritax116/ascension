@@ -178,8 +178,18 @@ document.getElementById("btn-echauffement").addEventListener("click", function (
     afficherRoutine("echauffement");
 });
 const champRecherche = document.getElementById("selecteur-recherche");
+const boutonVider = document.getElementById("btn-vider-recherche");
+
 champRecherche.addEventListener("input", function() {
     renderSelecteur(champRecherche.value);
+    boutonVider.hidden = champRecherche.value === "";
+});
+
+boutonVider.addEventListener("click", function() {
+    champRecherche.value = "";
+    boutonVider.hidden = true;
+    renderSelecteur();
+    champRecherche.focus();
 });
 document.getElementById("btn-etirement").addEventListener("click", function () {
     afficherRoutine("etirement");
@@ -1046,6 +1056,7 @@ function ouvrirSelecteur(){
     document.getElementById("selecteur-recherche").value ="";
     renderSelecteur();
     document.getElementById("selecteur-exercice").hidden = false;
+    document.getElementById("btn-vider-recherche").hidden = true;
 }
 
 function renderStreak() {
@@ -1103,12 +1114,22 @@ function choisirExercice(ex) {
     });
     fermerSelecteur();
     renderSeance();
+    ajouterSerieExo(seanceEnCours.exercices.length - 1);
 }
 
 function ajouterSerieExo(indexExo) {
-    seanceEnCours.exercices[indexExo].series.push({
-        kg: "",
-        reps: "",
+    const exo = seanceEnCours.exercices[indexExo];
+    const precedentes = seriesPrecedentes(exo.id);
+    const rang = exo.series.length;
+
+    let modele = precedentes[rang];
+    if (!modele && exo.series.length > 0) {
+        modele = exo.series[exo.series.length - 1];
+    }
+
+    exo.series.push({
+        kg: modele ? String(modele.poids !== undefined ? modele.poids : modele.kg) : "",
+        reps: modele ? String(modele.reps) : "",
         fait: false
     });
     renderSeance();
@@ -1144,6 +1165,19 @@ function abandonnerSeance() {
     relacherEcran();
     sauverSeance();
     changerPage("muscu");
+}
+
+function meilleurPoids(idExo) {
+    let meilleur = 0;
+    for (let i = 0; i < etat.seances.length; i++) {
+        const series = etat.seances[i].series;
+        for (let j = 0; j < series.length; j++) {
+            if (series[j].id === idExo && series[j].poids > meilleur) {
+                meilleur = series[j].poids;
+            }
+        }
+    }
+    return meilleur;
 }
 
 function renderSeance() {
@@ -1192,6 +1226,7 @@ function renderSeance() {
             }
             bloc.appendChild(entete);
         }
+        const precedentes = seriesPrecedentes(exo.id);
 
         for (let j = 0; j < exo.series.length; j++) {
             const serie = exo.series[j];
@@ -1213,7 +1248,8 @@ function renderSeance() {
 
             const precedent = document.createElement("span");
             precedent.className = "serie-precedent";
-            precedent.textContent = "–";
+            const avant = precedentes[j];
+precedent.textContent = avant ? avant.poids + "×" + avant.reps : "–";
 
             const champKg = document.createElement("input");
             champKg.type = "number";
@@ -1240,9 +1276,30 @@ function renderSeance() {
                 ligne.classList.add("fait");
             }
             valider.addEventListener("click", function() {
+                if (!serie.fait && !serieValide(serie)) {
+                    ligne.classList.add("invalide");
+                    setTimeout(function() {
+                        ligne.classList.remove("invalide");
+                    }, 1200);
+                    return;
+                }
                 serie.fait = !serie.fait;
+                serie.pr = false;
                 if (serie.fait) {
+                    seanceEnCours.fin = Date.now();
                     finRepos = Date.now() + dureeRepos * 1000;
+
+                    let record = meilleurPoids(exo.id);
+                    for (let k = 0; k < exo.series.length; k++) {
+                        const autre = exo.series[k];
+                        if (autre !== serie && autre.fait && Number(autre.kg) > record) {
+                            record = Number(autre.kg);
+                        }
+                    }
+                    if (record > 0 && Number(serie.kg) > record) {
+                        serie.pr = true;
+                        celebrer("🏆 Record ! " + exo.nom + " : " + serie.kg + " kg");
+                    }
                 } else {
                     finRepos = 0;
                 }
@@ -1299,6 +1356,14 @@ function majDureeSeance() {
     }
 }
 
+function serieValide(serie) {
+    const kg = Number(serie.kg);
+    const reps = Number(serie.reps);
+    const kgOk = serie.kg !== "" && kg >= 0 && kg <= 600;
+    const repsOk = Number.isInteger(reps) && reps >= 1 && reps <= 100;
+    return kgOk && repsOk;
+}
+
 function terminerSeance() {
     if (!seanceEnCours) {
         return;
@@ -1306,12 +1371,16 @@ function terminerSeance() {
 
     const series = [];
     let volume = 0;
+    let nbRecords = 0;
 
     for (let i = 0; i < seanceEnCours.exercices.length; i++) {
         const exo = seanceEnCours.exercices[i];
         for (let j = 0; j < exo.series.length; j++) {
             const s = exo.series[j];
             if (s.fait) {
+                if (s.pr) {
+                    nbRecords++;
+                }
                 series.push({
                     id: exo.id,
                     nom: exo.nom,
@@ -1329,7 +1398,8 @@ function terminerSeance() {
         return;
     }
 
-    const duree = (Date.now() - seanceEnCours.debut) / 60000;
+    const fin = seanceEnCours.fin || Date.now();
+    const duree = (fin - seanceEnCours.debut) / 60000;
     etat.seances.push({
         date: todayStr(),
         duree: duree,
@@ -1340,7 +1410,7 @@ function terminerSeance() {
         const s = series[i];
         etat.muscu.push({ id: s.id, nom: s.nom, poids: s.poids, reps: s.reps, muscle: s.muscle, date: todayStr() });
     }
-    etat.xp += 40;
+    etat.xp += 40 + nbRecords * 15;
     seanceEnCours = null;
     finRepos = 0;
     relacherEcran();
@@ -1356,6 +1426,22 @@ function sauverSeance() {
     } else {
         localStorage.removeItem("seanceEnCours");
     }
+}
+
+function seriesPrecedentes(idExo) {
+    for (let i = etat.seances.length - 1; i >= 0; i--) {
+        const trouvees = [];
+        const series = etat.seances[i].series;
+        for (let j = 0; j < series.length; j++) {
+            if (series[j].id === idExo) {
+                trouvees.push(series[j]);
+            }
+        }
+        if (trouvees.length > 0) {
+            return trouvees;
+        }
+    }
+    return [];
 }
 
 async function garderEcranAllume() {
