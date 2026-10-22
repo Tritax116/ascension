@@ -1535,3 +1535,56 @@ ul#seance-liste {
     font-size: var(--texte-corps);
     font-weight: 400;
 }
+
+/* ---------- Profil : donnees et export ---------- */
+.aide-texte {
+    font-size: var(--texte-label);
+    color: var(--texte-dim);
+    margin: 0 0 var(--espace-md);
+}
+
+#btn-export {
+    display: block;
+    width: 100%;
+}
+
+/* ---------- Selecteur : croix pour vider la recherche ---------- */
+#selecteur-champ {
+    position: relative;
+}
+
+#selecteur-champ #selecteur-recherche {
+    padding-right: 48px;
+}
+
+#btn-vider-recherche {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 32px;
+    height: 32px;
+    min-height: 0;
+    padding: 0;
+    border-radius: 50%;
+    background: var(--surface-2);
+    color: var(--texte-dim);
+    font-size: 14px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#btn-vider-recherche[hidden] {
+    display: none;
+}
+
+/* ---------- Seance : serie refusee (valeurs absurdes) ---------- */
+.serie-ligne.invalide {
+    background: rgba(191, 111, 88, 0.20);
+}
+
+.serie-ligne.invalide input {
+    box-shadow: 0 0 0 2px rgba(191, 111, 88, 0.6);
+}

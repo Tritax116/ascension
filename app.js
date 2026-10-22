@@ -92,6 +92,26 @@ let rangs = [
     { nom: "Diamant", division: "I", seuil: 9200, couleur: "#A78BFA" },
 ];
 
+function exporterDonnees() {
+    const sauvegarde = {
+        application: "Ascension",
+        version: 1,
+        exporteLe: new Date().toISOString(),
+        etat: etat,
+        seanceEnCours: seanceEnCours
+    };
+    const contenu = JSON.stringify(sauvegarde, null, 2);
+    const blob = new Blob([contenu], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const lien = document.createElement("a");
+    lien.href = url;
+    lien.download = "ascension-" + todayStr() + ".json";
+    document.body.appendChild(lien);
+    lien.click();
+    lien.remove();
+    URL.revokeObjectURL(url);
+}
+
 function save() {
     localStorage.setItem("etat", JSON.stringify(etat));
 
@@ -170,6 +190,7 @@ document.getElementById("btn-header-profil").addEventListener("click", function 
 document.getElementById("btn-retour-profil").addEventListener("click", function () {
     changerPage("accueil");
 });
+document.getElementById("btn-export").addEventListener("click", exporterDonnees);
 const boutonsVue = document.querySelectorAll(".vue-muscle");
 
 for (let i = 0; i < boutonsVue.length; i++) {
