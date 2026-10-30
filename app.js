@@ -249,7 +249,7 @@ function render() {
     }
     etat.dernierRang = rangActuel;
     const stageAvatar = nomsRangs.indexOf(rang.nom);
-    const dejaFait = etat.history[hoy] && etat.history[hoy].presence;
+    const dejaFait = (etat.history[hoy] && etat.history[hoy].presence) || seanceEnCours;
     document.getElementById("lock-screen").hidden = dejaFait;
     document.getElementById("dashboard").hidden = !dejaFait;
     const prochain = xpProchainStade();
