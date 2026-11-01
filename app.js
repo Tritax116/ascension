@@ -58,6 +58,49 @@ function addDays(dateStr, delta) {
     return dt.getFullYear() + "-" + pad(dt.getMonth() + 1) + "-" + pad(dt.getDate());
 }
 
+function lundiDeLaSemaine() {
+    const d = new Date();
+    const jour = d.getDay();
+    const retard = jour === 0 ? 6 : jour - 1;
+    return addDays(todayStr(), -retard);
+}
+
+const OBJECTIF_SEMAINE = { seances: 3, series: 24, volume: 10000 };
+
+function statsSemaine() {
+    const lundi = lundiDeLaSemaine();
+    const seances = etat.seances || [];
+    let nbSeances = 0;
+    let nbSeries = 0;
+    let volume = 0;
+    for (let i = 0; i < seances.length; i++) {
+        const s = seances[i];
+        if (s.date >= lundi) {
+            nbSeances++;
+            nbSeries += s.series.length;
+            volume += s.volume;
+        }
+    }
+    return { seances: nbSeances, series: nbSeries, volume: volume };
+}
+
+function renderAnneaux() {
+    const stats = statsSemaine();
+    const anneaux = document.querySelectorAll("#anneaux-semaine .sem-ring");
+    for (let i = 0; i < anneaux.length; i++) {
+        const cle = anneaux[i].dataset.cle;
+        const valeur = stats[cle];
+        const objectif = OBJECTIF_SEMAINE[cle];
+        const part = Math.min(valeur / objectif, 1);
+        const circ = 2 * Math.PI * 26;
+        const arc = anneaux[i].querySelector(".sem-ring-val");
+        arc.style.strokeDasharray = (part * circ) + " " + circ;
+        anneaux[i].classList.toggle("complet", valeur >= objectif);
+        anneaux[i].querySelector(".sem-ring-chiffre").textContent = cle === "volume" ? Math.round(valeur / 100) / 10 + "k" : valeur;
+        anneaux[i].querySelector(".sem-ring-objectif").textContent = "/ " + (cle === "volume" ? objectif / 1000 + "k" : objectif);
+    }
+}
+
 
 let etat = JSON.parse(localStorage.getItem("etat")) || { xp: 0, streak: 0, bestStreak: 0, lastActiveDate: null, history: {}, muscu: [], course: [] };
 const badges = [
@@ -337,6 +380,7 @@ save();
 render();
 
 function renderMuscu() {
+    renderAnneaux();
     document.getElementById("bloc-filtre-muscle").hidden = !filtreMuscle;
     if (filtreMuscle) {
         document.getElementById("filtre-titre").textContent = "Exercices — " + filtreMuscle;

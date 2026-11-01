@@ -1588,3 +1588,17 @@ ul#seance-liste {
 .serie-ligne.invalide input {
     box-shadow: 0 0 0 2px rgba(191, 111, 88, 0.6);
 }
+
+/* ANNEAUX DE LA SEMAINE */
+#anneaux-semaine { margin: 1.25rem 0; }
+#anneaux-semaine h3 { margin: 0 0 0.75rem; }
+.sem-rings { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
+.sem-ring { position: relative; display: flex; flex-direction: column; align-items: center; padding: 0.75rem 0.25rem; background: var(--surface); border-radius: var(--rayon, 16px); }
+.sem-ring svg { width: 4.5rem; height: 4.5rem; transform: rotate(-90deg); }
+.sem-ring circle { fill: none; stroke-width: 6; }
+.sem-ring-fond { stroke: var(--surface-2); }
+.sem-ring-val { stroke: var(--kaki-clair); stroke-linecap: round; stroke-dasharray: 0 164; transition: stroke-dasharray 0.6s ease; }
+.sem-ring.complet .sem-ring-val { stroke: var(--accent); }
+.sem-ring-chiffre { position: absolute; top: 1.6rem; font-weight: 700; font-size: 0.9rem; line-height: 1; }
+.sem-ring-objectif { position: absolute; top: 2.75rem; font-size: 0.65rem; opacity: 0.6; }
+.sem-ring-nom { margin-top: 0.4rem; font-size: 0.75rem; opacity: 0.75; }

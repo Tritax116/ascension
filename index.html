@@ -65,6 +65,30 @@
 
             <button id="btn-demarrer-seance" class="btn-primaire">Démarrer une séance</button>
 
+            <section id="anneaux-semaine">
+                <h3>Cette semaine</h3>
+                <div class="sem-rings">
+                    <div class="sem-ring" data-cle="seances">
+                        <svg viewBox="0 0 64 64" aria-hidden="true"><circle class="sem-ring-fond" cx="32" cy="32" r="26"/><circle class="sem-ring-val" cx="32" cy="32" r="26"/></svg>
+                        <span class="sem-ring-chiffre">0</span>
+                        <span class="sem-ring-objectif">/ 3</span>
+                        <span class="sem-ring-nom">Séances</span>
+                    </div>
+                    <div class="sem-ring" data-cle="series">
+                        <svg viewBox="0 0 64 64" aria-hidden="true"><circle class="sem-ring-fond" cx="32" cy="32" r="26"/><circle class="sem-ring-val" cx="32" cy="32" r="26"/></svg>
+                        <span class="sem-ring-chiffre">0</span>
+                        <span class="sem-ring-objectif">/ 24</span>
+                        <span class="sem-ring-nom">Séries</span>
+                    </div>
+                    <div class="sem-ring" data-cle="volume">
+                        <svg viewBox="0 0 64 64" aria-hidden="true"><circle class="sem-ring-fond" cx="32" cy="32" r="26"/><circle class="sem-ring-val" cx="32" cy="32" r="26"/></svg>
+                        <span class="sem-ring-chiffre">0</span>
+                        <span class="sem-ring-objectif">/ 10k</span>
+                        <span class="sem-ring-nom">Volume (kg)</span>
+                    </div>
+                </div>
+            </section>
+
 <div class="vues-muscle">
     <button data-vue="front" class="vue-muscle on">Face</button>
     <button data-vue="back" class="vue-muscle">Dos</button>
