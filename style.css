@@ -1602,3 +1602,21 @@ ul#seance-liste {
 .sem-ring-chiffre { position: absolute; top: 1.6rem; font-weight: 700; font-size: 0.9rem; line-height: 1; }
 .sem-ring-objectif { position: absolute; top: 2.75rem; font-size: 0.65rem; opacity: 0.6; }
 .sem-ring-nom { margin-top: 0.4rem; font-size: 0.75rem; opacity: 0.75; }
+
+/* PROGRAMME, SUGGESTION, REPOS PAR EXERCICE, MODES DE CARTE, FILTRES */
+.prochaine-seance { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.75rem; justify-content: space-between; margin: 0.75rem 0; padding: 0.75rem 1rem; background: var(--surface); border-radius: var(--rayon, 16px); }
+.prochaine-seance:empty { display: none; }
+.prochaine-texte { font-size: 0.95rem; }
+.prochaine-autres { display: flex; flex-wrap: wrap; gap: 0.4rem; width: 100%; }
+.seance-exo-aide { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin: 0 0 0.5rem; padding: 0.5rem 0.75rem; font-size: 0.8rem; color: var(--texte-dim, #A9A58F); background: var(--surface-2); border-radius: 12px; }
+.seance-exo-aide button { flex-shrink: 0; }
+.btn-repos-exo { margin-left: auto; margin-right: 0.5rem; padding: 0.25rem 0.7rem; border: none; border-radius: 999px; background: var(--surface-2); color: var(--texte-dim, #A9A58F); font-size: 0.8rem; cursor: pointer; }
+.modes-carte { display: flex; gap: 0.4rem; margin: 0.75rem 0 0.25rem; }
+.mode-carte { padding: 0.4rem 0.9rem; border: none; border-radius: 999px; background: var(--surface-2); color: var(--texte-dim, #A9A58F); font-size: 0.85rem; cursor: pointer; }
+.mode-carte.on { background: var(--kaki); color: var(--bg); }
+.filtres-rangee { display: flex; gap: 0.4rem; width: 100%; overflow-x: auto; padding-bottom: 0.25rem; }
+.filtres-rangee .filtre-puce { flex-shrink: 0; }
+.seance-histo { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+
+/* Messages d'alerte de l'accueil : ambre calme plutot que rouge */
+#streak-alerte, #quete-penalite { color: #D9A25A; }

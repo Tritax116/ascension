@@ -16,7 +16,29 @@ let verrouEcran = null;
 let seanceEnCours = JSON.parse(localStorage.getItem("seanceEnCours")) || null;
 let finRepos = 0;
 const DUREES_REPOS = [60, 90, 120, 180];
-let dureeRepos = Number(localStorage.getItem("dureeRepos")) || 90;
+let reposExos = JSON.parse(localStorage.getItem("reposExos")) || {};
+let exosRecents = JSON.parse(localStorage.getItem("exosRecents")) || [];
+let filtresSelecteur = { muscle: null, materiel: null };
+let modeCarte = "volume";
+const FOURCHETTE_REPS = { min: 8, max: 12 };
+const NB_SERIES_PROGRAMME = 3;
+
+const COULEURS_CARTE = { rouge: "#BF6F58", ambre: "#D9A25A", vert: "#8E9A62", terne: "#4A5035" };
+
+const LEGENDES_CARTE = {
+    volume: [["#3A3B2E", "Non travaillé"], ["#A67C52", "Bronze"], ["#B0B0B0", "Argent"], ["#F2C744", "Or"], ["#5DBEBE", "Platine"], ["#A78BFA", "Diamant"]],
+    recup: [["#3A3B2E", "Jamais travaillé"], [COULEURS_CARTE.rouge, "Travaillé il y a 0-1 j : en récup"], [COULEURS_CARTE.ambre, "2 j : presque prêt"], [COULEURS_CARTE.vert, "3 j et plus : prêt"]],
+    delaisse: [["#3A3B2E", "Jamais travaillé"], [COULEURS_CARTE.rouge, "7 j et plus : délaissé"], [COULEURS_CARTE.ambre, "4 à 6 j"], [COULEURS_CARTE.terne, "Récent"]]
+};
+
+// Programme "Force & Esthetique" : un groupe par seance, 5 exercices max.
+// jour : 1 = lundi ... 5 = vendredi (comme Date.getDay()). Modifiable ici.
+const PROGRAMMES = [
+    { nom: "Jambes", jour: 1, exercices: ["hack-squat", "bulgarian-squat", "leg-extension", "leg-curl-assis", "mollets-debout"] },
+    { nom: "Dos", jour: 2, exercices: ["tractions-assistees", "pulldown-serre", "rowing-cable", "rowing-haltere", "face-pull"] },
+    { nom: "Pecs + triceps", jour: 3, exercices: ["developpe-incline", "chest-press", "pec-fly", "pushdown", "extension-nuque"] },
+    { nom: "Épaules + bras", jour: 5, exercices: ["developpe-epaules", "elevations-lat", "rear-delt", "curl-ez", "curl-marteau"] }
+];
 
 
 
@@ -381,6 +403,7 @@ render();
 
 function renderMuscu() {
     renderAnneaux();
+    renderProchaineSeance();
     document.getElementById("bloc-filtre-muscle").hidden = !filtreMuscle;
     if (filtreMuscle) {
         document.getElementById("filtre-titre").textContent = "Exercices — " + filtreMuscle;
@@ -676,17 +699,69 @@ function rangMuscle(muscle) {
     return rangActuel;
 }
 
+// Nombre de jours depuis la derniere fois qu'un muscle a ete travaille (null = jamais).
+function joursDepuisMuscle(muscle) {
+    let derniere = null;
+    for (let i = 0; i < etat.muscu.length; i++) {
+        if (etat.muscu[i].muscle === muscle && (derniere === null || etat.muscu[i].date > derniere)) {
+            derniere = etat.muscu[i].date;
+        }
+    }
+    return derniere === null ? null : joursEntre(derniere, todayStr());
+}
+
+function couleurMuscle(nom) {
+    if (modeCarte === "volume") {
+        return volumeMuscle(nom) === 0 ? "" : rangMuscle(nom).couleur;
+    }
+    const jours = joursDepuisMuscle(nom);
+    if (jours === null) {
+        return "";
+    }
+    if (modeCarte === "recup") {
+        if (jours <= 1) {
+            return COULEURS_CARTE.rouge;
+        }
+        return jours === 2 ? COULEURS_CARTE.ambre : COULEURS_CARTE.vert;
+    }
+    if (jours >= 7) {
+        return COULEURS_CARTE.rouge;
+    }
+    return jours >= 4 ? COULEURS_CARTE.ambre : COULEURS_CARTE.terne;
+}
+
 function colorerMuscles() {
     const zones = document.querySelectorAll("[data-muscle]");
     for (let i = 0; i < zones.length; i++) {
-        const nom = zones[i].dataset.muscle;
-        const volume = volumeMuscle(nom);
-        if (volume === 0) {
-            zones[i].style.fill = "";
-        } else {
-            zones[i].style.fill = rangMuscle(nom).couleur;
-        }
+        zones[i].style.fill = couleurMuscle(zones[i].dataset.muscle);
     }
+    const legende = document.getElementById("legende-muscles");
+    legende.innerHTML = "";
+    const entrees = LEGENDES_CARTE[modeCarte];
+    for (let i = 0; i < entrees.length; i++) {
+        const ligne = document.createElement("span");
+        const pastille = document.createElement("i");
+        pastille.style.background = entrees[i][0];
+        ligne.appendChild(pastille);
+        ligne.appendChild(document.createTextNode(" " + entrees[i][1]));
+        legende.appendChild(ligne);
+    }
+}
+
+function changerModeCarte(mode) {
+    modeCarte = mode;
+    const boutons = document.querySelectorAll(".mode-carte");
+    for (let i = 0; i < boutons.length; i++) {
+        boutons[i].classList.toggle("on", boutons[i].dataset.mode === mode);
+    }
+    colorerMuscles();
+}
+
+const boutonsModeCarte = document.querySelectorAll(".mode-carte");
+for (let i = 0; i < boutonsModeCarte.length; i++) {
+    boutonsModeCarte[i].addEventListener("click", function() {
+        changerModeCarte(boutonsModeCarte[i].dataset.mode);
+    });
 }
 
 function changerVueMuscle(vue) {
@@ -776,7 +851,7 @@ function renderQuete() {
     const liste = document.getElementById("quete-objectifs");
     liste.innerHTML = "";
     if (etat.quete.penalite) {
-        document.getElementById("quete-penalite").textContent = "⚔️ Quête de rachat — tu as raté hier, objectifs renforcés !";
+        document.getElementById("quete-penalite").textContent = "Quête de rachat — hier est passé, les objectifs sont renforcés aujourd'hui.";
     } else {
         document.getElementById("quete-penalite").textContent = "";
     }
@@ -809,7 +884,7 @@ function renderQuete() {
     if (etat.quete.faite) {
         document.getElementById("streak-alerte").textContent = "";
     } else {
-        document.getElementById("streak-alerte").textContent = "⚠️ Quête non terminée — streak en danger !";
+        document.getElementById("streak-alerte").textContent = "Quête du jour en cours — ton streak compte sur toi.";
     }
 }
 
@@ -1035,13 +1110,54 @@ function normaliser(texte) {
     .replace(/[\u0300-\u036f]/g, "");
 }
 
+function ajouterRangeeFiltres(conteneur, cle, noms) {
+    const rangee = document.createElement("div");
+    rangee.className = "filtres-rangee";
+    for (const valeur in noms) {
+        const puce = document.createElement("button");
+        puce.className = "filtre-puce" + (filtresSelecteur[cle] === valeur ? " actif" : "");
+        puce.textContent = noms[valeur];
+        puce.addEventListener("click", function() {
+            filtresSelecteur[cle] = filtresSelecteur[cle] === valeur ? null : valeur;
+            renderSelecteur();
+        });
+        rangee.appendChild(puce);
+    }
+    conteneur.appendChild(rangee);
+}
+
+function renderFiltresSelecteur() {
+    const conteneur = document.getElementById("selecteur-filtres");
+    conteneur.innerHTML = "";
+    ajouterRangeeFiltres(conteneur, "muscle", NOMS_MUSCLES);
+    ajouterRangeeFiltres(conteneur, "materiel", NOMS_MATERIEL);
+}
+
+function noterRecent(idExo) {
+    exosRecents = exosRecents.filter(function(id) { return id !== idExo; });
+    exosRecents.unshift(idExo);
+    exosRecents = exosRecents.slice(0, 6);
+    localStorage.setItem("exosRecents", JSON.stringify(exosRecents));
+}
+
 function renderSelecteur(recherche) {
     const liste = document.getElementById("selecteur-liste");
     liste.innerHTML = "";
+    if (recherche === undefined) {
+        recherche = document.getElementById("selecteur-recherche").value;
+    }
+    renderFiltresSelecteur();
 
     const terme = normaliser(recherche || "");
-    if (terme !== "") {
+    const filtre = filtresSelecteur.muscle || filtresSelecteur.materiel;
+    if (terme !== "" || filtre) {
         const resultats = EXERCICES.filter(function(e) {
+            if (filtresSelecteur.muscle && e.muscle !== filtresSelecteur.muscle) {
+                return false;
+            }
+            if (filtresSelecteur.materiel && e.materiel !== filtresSelecteur.materiel) {
+                return false;
+            }
             const texte = e.nom + " " + NOMS_MUSCLES[e.muscle] + " " + NOMS_MATERIEL[e.materiel];
             return normaliser(texte).includes(terme);
         });
@@ -1056,9 +1172,17 @@ function renderSelecteur(recherche) {
         return;
     }
 
+    const recents = [];
+    for (let i = 0; i < exosRecents.length; i++) {
+        const ex = trouverExercice(exosRecents[i]);
+        if (ex) {
+            recents.push(ex);
+        }
+    }
     const favoris = EXERCICES.filter(function(e){ return e.favori; });
     const autres = EXERCICES.filter(function(e){ return !e.favori; });
 
+    ajouterSection(liste, "Récents", recents);
     ajouterSection(liste, "Favoris", favoris);
     ajouterSection(liste, "Tous les exercices", autres);
 }
@@ -1098,6 +1222,7 @@ function ajouterSection(liste, titre, exercices) {
 
 function ouvrirSelecteur(){
     document.getElementById("selecteur-recherche").value ="";
+    filtresSelecteur = { muscle: null, materiel: null };
     renderSelecteur();
     document.getElementById("selecteur-exercice").hidden = false;
     document.getElementById("btn-vider-recherche").hidden = true;
@@ -1150,6 +1275,7 @@ function demarrerSeance() {
 }
 
 function choisirExercice(ex) {
+    noterRecent(ex.id);
     seanceEnCours.exercices.push({
         id: ex.id,
         nom: ex.nom,
@@ -1161,8 +1287,7 @@ function choisirExercice(ex) {
     ajouterSerieExo(seanceEnCours.exercices.length - 1);
 }
 
-function ajouterSerieExo(indexExo) {
-    const exo = seanceEnCours.exercices[indexExo];
+function creerSerie(exo) {
     const precedentes = seriesPrecedentes(exo.id);
     const rang = exo.series.length;
 
@@ -1171,12 +1296,224 @@ function ajouterSerieExo(indexExo) {
         modele = exo.series[exo.series.length - 1];
     }
 
-    exo.series.push({
+    return {
         kg: modele ? String(modele.poids !== undefined ? modele.poids : modele.kg) : "",
         reps: modele ? String(modele.reps) : "",
         fait: false
-    });
+    };
+}
+
+function ajouterSerieExo(indexExo) {
+    const exo = seanceEnCours.exercices[indexExo];
+    exo.series.push(creerSerie(exo));
     renderSeance();
+}
+
+// Formule d'Epley, fiable jusqu'a ~12 reps. Arrondie au 0,5 kg.
+function estimer1RM(poids, reps) {
+    poids = Number(poids);
+    reps = Number(reps);
+    if (!(poids > 0) || !(reps >= 1) || reps > 12) {
+        return 0;
+    }
+    return Math.round(poids * (1 + reps / 30) * 2) / 2;
+}
+
+function meilleur1RM(idExo) {
+    let meilleur = 0;
+    for (let i = 0; i < etat.seances.length; i++) {
+        const series = etat.seances[i].series;
+        for (let j = 0; j < series.length; j++) {
+            if (series[j].id === idExo) {
+                meilleur = Math.max(meilleur, estimer1RM(series[j].poids, series[j].reps));
+            }
+        }
+    }
+    return meilleur;
+}
+
+// Double progression : meme charge jusqu'au haut de la fourchette sur toutes
+// les series lourdes, puis on monte. Renvoie null s'il n'y a pas d'historique.
+function suggestionCharge(idExo) {
+    const precedentes = seriesPrecedentes(idExo);
+    if (precedentes.length === 0) {
+        return null;
+    }
+    let poids = 0;
+    for (let i = 0; i < precedentes.length; i++) {
+        poids = Math.max(poids, Number(precedentes[i].poids));
+    }
+    const lourdes = precedentes.filter(function(s) { return Number(s.poids) === poids; });
+    let repsMin = Infinity;
+    for (let i = 0; i < lourdes.length; i++) {
+        repsMin = Math.min(repsMin, Number(lourdes[i].reps));
+    }
+    const exo = trouverExercice(idExo);
+    const pas = exo && exo.materiel === "barre" ? 2.5 : 2;
+
+    if (poids === 0) {
+        const cible = Math.min(repsMin + 1, 99);
+        return { poids: 0, reps: cible, raison: "Poids du corps : vise " + cible + " reps (tu as fait " + repsMin + " au pire)" };
+    }
+    if (repsMin >= FOURCHETTE_REPS.max) {
+        return { poids: poids + pas, reps: FOURCHETTE_REPS.min, raison: "Toutes tes séries à " + repsMin + " reps à " + poids + " kg : on monte de " + pas + " kg" };
+    }
+    const cible = Math.min(repsMin + 1, FOURCHETTE_REPS.max);
+    return { poids: poids, reps: cible, raison: "Même charge : vise " + cible + " reps (tu as fait " + repsMin + " au pire)" };
+}
+
+function appliquerSuggestion(indexExo, suggestion) {
+    const exo = seanceEnCours.exercices[indexExo];
+    if (exo.series.length === 0) {
+        exo.series.push({ kg: "", reps: "", fait: false });
+    }
+    for (let i = 0; i < exo.series.length; i++) {
+        if (!exo.series[i].fait) {
+            exo.series[i].kg = String(suggestion.poids);
+            exo.series[i].reps = String(suggestion.reps);
+        }
+    }
+    renderSeance();
+}
+
+// Repos : choix de Kylian pour l'exercice, sinon selon le materiel.
+function reposPour(idExo) {
+    if (reposExos[idExo]) {
+        return reposExos[idExo];
+    }
+    const exo = trouverExercice(idExo);
+    if (exo && exo.materiel === "barre") {
+        return 120;
+    }
+    if (exo && exo.materiel === "corps") {
+        return 60;
+    }
+    return 90;
+}
+
+function changerReposExo(idExo) {
+    const position = DUREES_REPOS.indexOf(reposPour(idExo));
+    reposExos[idExo] = DUREES_REPOS[(position + 1) % DUREES_REPOS.length];
+    localStorage.setItem("reposExos", JSON.stringify(reposExos));
+    renderSeance();
+}
+
+// Indice du programme propose : celui d'aujourd'hui s'il n'est pas deja fait,
+// sinon le prochain jour d'entrainement de la semaine.
+function prochainProgramme() {
+    const aujourdhui = new Date().getDay();
+    const dejaFaitAujourdhui = etat.seances.some(function(s) { return s.date === todayStr(); });
+    for (let decalage = dejaFaitAujourdhui ? 1 : 0; decalage < 8; decalage++) {
+        const jour = (aujourdhui + decalage) % 7;
+        for (let i = 0; i < PROGRAMMES.length; i++) {
+            if (PROGRAMMES[i].jour === jour) {
+                return { index: i, aujourdhui: decalage === 0 };
+            }
+        }
+    }
+    return { index: 0, aujourdhui: false };
+}
+
+function demarrerProgramme(index) {
+    if (seanceEnCours) {
+        changerPage("seance");
+        return;
+    }
+    const programme = PROGRAMMES[index];
+    const exercices = [];
+    for (let i = 0; i < programme.exercices.length; i++) {
+        const ex = trouverExercice(programme.exercices[i]);
+        if (!ex) {
+            continue;
+        }
+        const exo = { id: ex.id, nom: ex.nom, muscle: ex.muscle, series: [] };
+        const suggestion = suggestionCharge(ex.id);
+        for (let k = 0; k < NB_SERIES_PROGRAMME; k++) {
+            const serie = creerSerie(exo);
+            if (suggestion) {
+                serie.kg = String(suggestion.poids);
+                serie.reps = String(suggestion.reps);
+            }
+            exo.series.push(serie);
+        }
+        exercices.push(exo);
+        noterRecent(ex.id);
+    }
+    seanceEnCours = { debut: Date.now(), exercices: exercices };
+    sauverSeance();
+    garderEcranAllume();
+    renderSeance();
+    changerPage("seance");
+}
+
+function refaireSeance(index) {
+    if (seanceEnCours) {
+        alert("Termine ou abandonne ta séance en cours avant d'en refaire une.");
+        return;
+    }
+    const exercices = [];
+    const parId = {};
+    const series = etat.seances[index].series;
+    for (let i = 0; i < series.length; i++) {
+        const s = series[i];
+        if (!s.id) {
+            continue;
+        }
+        if (!parId[s.id]) {
+            parId[s.id] = { id: s.id, nom: s.nom, muscle: s.muscle, series: [] };
+            exercices.push(parId[s.id]);
+        }
+        parId[s.id].series.push({ kg: String(s.poids), reps: String(s.reps), fait: false });
+    }
+    if (exercices.length === 0) {
+        alert("Cette séance n'a pas de détail à refaire.");
+        return;
+    }
+    seanceEnCours = { debut: Date.now(), exercices: exercices };
+    sauverSeance();
+    garderEcranAllume();
+    renderSeance();
+    changerPage("seance");
+}
+
+function renderProchaineSeance() {
+    const proposition = prochainProgramme();
+    const programme = PROGRAMMES[proposition.index];
+    const jours = ["dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"];
+    const quand = proposition.aujourdhui ? "Aujourd'hui" : "Prochaine : " + jours[programme.jour];
+    const cibles = ["prochaine-seance", "prochaine-seance-accueil"];
+    for (let i = 0; i < cibles.length; i++) {
+        const bloc = document.getElementById(cibles[i]);
+        if (!bloc) {
+            continue;
+        }
+        bloc.innerHTML = "";
+        const texte = document.createElement("span");
+        texte.className = "prochaine-texte";
+        texte.textContent = quand + " · " + programme.nom + " (" + programme.exercices.length + " exercices)";
+        const bouton = document.createElement("button");
+        bouton.className = "btn-secondaire";
+        bouton.textContent = seanceEnCours ? "Reprendre" : "Démarrer";
+        bouton.addEventListener("click", function() {
+            demarrerProgramme(proposition.index);
+        });
+        bloc.appendChild(texte);
+        bloc.appendChild(bouton);
+        if (cibles[i] === "prochaine-seance") {
+            const autres = document.createElement("div");
+            autres.className = "prochaine-autres";
+            for (let k = 0; k < PROGRAMMES.length; k++) {
+                const puce = document.createElement("button");
+                puce.className = "filtre-puce" + (k === proposition.index ? " actif" : "");
+                puce.textContent = PROGRAMMES[k].nom;
+                puce.addEventListener("click", function() {
+                    demarrerProgramme(k);
+                });
+                autres.appendChild(puce);
+            }
+            bloc.appendChild(autres);
+        }
+    }
 }
 
 function supprimerSerie(indexExo, indexSerie) {
@@ -1193,13 +1530,6 @@ function supprimerExercice(indexExo) {
         return;
     }
     seanceEnCours.exercices.splice(indexExo, 1);
-    renderSeance();
-}
-
-function changerDureeRepos() {
-    const position = DUREES_REPOS.indexOf(dureeRepos);
-    dureeRepos = DUREES_REPOS[(position + 1) % DUREES_REPOS.length];
-    localStorage.setItem("dureeRepos", dureeRepos);
     renderSeance();
 }
 
@@ -1255,9 +1585,36 @@ function renderSeance() {
             supprimerExercice(i);
         });
 
+        const btnRepos = document.createElement("button");
+        btnRepos.className = "btn-repos-exo";
+        btnRepos.textContent = "⏱ " + reposPour(exo.id) + " s";
+        btnRepos.setAttribute("aria-label", "Changer le temps de repos de cet exercice");
+        btnRepos.addEventListener("click", function() {
+            changerReposExo(exo.id);
+        });
+
         tete.appendChild(titre);
+        tete.appendChild(btnRepos);
         tete.appendChild(btnSuppr);
         bloc.appendChild(tete);
+
+        const suggestion = suggestionCharge(exo.id);
+        if (suggestion) {
+            const aide = document.createElement("div");
+            aide.className = "seance-exo-aide";
+            const texte = document.createElement("span");
+            const rm = meilleur1RM(exo.id);
+            texte.textContent = "💡 " + suggestion.poids + " kg × " + suggestion.reps + " · " + suggestion.raison + (rm ? " · 1RM ≈ " + rm + " kg" : "");
+            const appliquer = document.createElement("button");
+            appliquer.className = "btn-tertiaire";
+            appliquer.textContent = "Appliquer";
+            appliquer.addEventListener("click", function() {
+                appliquerSuggestion(i, suggestion);
+            });
+            aide.appendChild(texte);
+            aide.appendChild(appliquer);
+            bloc.appendChild(aide);
+        }
 
         if (exo.series.length > 0) {
             const entete = document.createElement("div");
@@ -1331,7 +1688,7 @@ precedent.textContent = avant ? avant.poids + "×" + avant.reps : "–";
                 serie.pr = false;
                 if (serie.fait) {
                     seanceEnCours.fin = Date.now();
-                    finRepos = Date.now() + dureeRepos * 1000;
+                    finRepos = Date.now() + reposPour(exo.id) * 1000;
 
                     let record = meilleurPoids(exo.id);
                     for (let k = 0; k < exo.series.length; k++) {
@@ -1370,7 +1727,6 @@ precedent.textContent = avant ? avant.poids + "×" + avant.reps : "–";
     }
     document.getElementById("seance-volume").textContent = volume + " kg";
     document.getElementById("seance-series").textContent = nbSeries + (nbSeries > 1 ? " séries" : " série");
-    document.getElementById("btn-duree-repos").textContent = "⏱ " + dureeRepos + " s";
 }
 
 function majDureeSeance() {
@@ -1521,16 +1877,24 @@ document.addEventListener("visibilitychange", function() {
     }
 });
 
-document.getElementById("btn-duree-repos").addEventListener("click", changerDureeRepos);
-
 
 function renderSeances() {
     const liste = document.getElementById("seances-historique");
     liste.innerHTML = "";
-    for (let i = 0; i < etat.seances.length; i++) {
+    for (let i = etat.seances.length - 1; i >= 0; i--) {
         const s = etat.seances[i];
         const li = document.createElement("li");
-        li.textContent = s.date + " — " + formaterDuree(s.duree) + " — " + s.volume + " kg — " + s.series.length + " séries";
+        li.className = "seance-histo";
+        const texte = document.createElement("span");
+        texte.textContent = s.date + " — " + formaterDuree(s.duree) + " — " + s.volume + " kg — " + s.series.length + " séries";
+        const refaire = document.createElement("button");
+        refaire.className = "btn-tertiaire";
+        refaire.textContent = "Refaire";
+        refaire.addEventListener("click", function() {
+            refaireSeance(i);
+        });
+        li.appendChild(texte);
+        li.appendChild(refaire);
         liste.appendChild(li);
     }
 }
