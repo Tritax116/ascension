@@ -1620,3 +1620,15 @@ ul#seance-liste {
 
 /* Messages d'alerte de l'accueil : ambre calme plutot que rouge */
 #streak-alerte, #quete-penalite { color: #D9A25A; }
+
+/* Repos par exercice : - / valeur / + de 15 s en 15 s */
+.repos-exo { display: flex; align-items: center; gap: 0.25rem; margin-left: auto; margin-right: 0.5rem; padding: 0.15rem; background: var(--surface-2); border-radius: 999px; font-size: 0.8rem; color: var(--texte-dim, #A9A58F); }
+.repos-exo button { width: 1.6rem; height: 1.6rem; padding: 0; border: none; border-radius: 50%; background: transparent; color: inherit; font-size: 1rem; cursor: pointer; }
+.repos-exo span { min-width: 3.4rem; text-align: center; }
+
+/* Creation d'un exercice personnel */
+#form-creer-exo { display: flex; flex-direction: column; gap: 0.5rem; margin: 0.5rem 0 1rem; padding: 0.75rem; background: var(--surface); border-radius: var(--rayon, 16px); }
+#form-creer-exo input, #form-creer-exo select { width: 100%; box-sizing: border-box; padding: 0.7rem 0.8rem; border: 1px solid var(--verre-bordure, rgba(180,179,137,0.2)); border-radius: 12px; background: var(--surface-2); color: var(--texte); font-size: 1rem; font-family: inherit; }
+.creer-exo-actions { display: flex; gap: 0.5rem; align-items: center; }
+.creer-exo-actions .btn-primaire { flex: 1; }
+#btn-creer-exo { align-self: flex-start; }

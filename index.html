@@ -29,7 +29,6 @@
                 <button data-page="accueil" class="onglet actif"><span class="onglet-icone"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20h14V9.5"/><path d="M9.5 20v-6h5v6"/></svg></span><span class="onglet-label">Accueil</span></button>
                 <button data-page="muscu" class="onglet"><span class="onglet-icone"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 9v6"/><path d="M5.5 7v10"/><path d="M5.5 12h13"/><path d="M18.5 7v10"/><path d="M21.5 9v6"/></svg></span><span class="onglet-label">Muscu</span></button>
                 <button data-page="course" class="onglet"><span class="onglet-icone"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg></span><span class="onglet-label">Course</span></button>
-                <button data-page="mobilite" class="onglet"><span class="onglet-icone"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2"/><path d="M12 7v6"/><path d="M8 20l4-7 4 7"/><path d="M7.5 11h9"/></svg></span><span class="onglet-label">Mobilité</span></button>
                 <button data-page="nutrition" class="onglet"><span class="onglet-icone"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3v7a3 3 0 0 0 6 0V3"/><path d="M8 3v18"/><path d="M17 3c-1.5 1-2 3-2 6s.5 4 2 5v7"/></svg></span><span class="onglet-label">Nutrition</span></button>
             </nav>
 
@@ -238,51 +237,6 @@
             <ul id="nutri-resultats"></ul>
         </div>
 
-        <div id="page-mobilite" class="page">
-            <h2>Mobilité</h2>
-
-            <h3>Test du jour</h3>
-<div class="test-mobilite">
-    <span>Souplesse</span>
-    <div class="selecteur" id="sel-souplesse">
-        <button class="btn-note" data-note="1">1</button>
-        <button class="btn-note" data-note="2">2</button>
-        <button class="btn-note" data-note="3">3</button>
-        <button class="btn-note" data-note="4">4</button>
-        <button class="btn-note" data-note="5">5</button>
-    </div>
-</div>
-<div class="test-mobilite">
-    <span>Squat</span>
-    <div class="selecteur" id="sel-squat">
-        <button class="btn-note" data-note="1">1</button>
-        <button class="btn-note" data-note="2">2</button>
-        <button class="btn-note" data-note="3">3</button>
-        <button class="btn-note" data-note="4">4</button>
-        <button class="btn-note" data-note="5">5</button>
-    </div>
-</div>
-<div class="test-mobilite">
-    <span>Épaules</span>
-    <div class="selecteur" id="sel-epaules">
-        <button class="btn-note" data-note="1">1</button>
-        <button class="btn-note" data-note="2">2</button>
-        <button class="btn-note" data-note="3">3</button>
-        <button class="btn-note" data-note="4">4</button>
-        <button class="btn-note" data-note="5">5</button>
-    </div>
-</div>
-                            <button id="btn-mesurer-mobilite" class="btn-primaire">Mesurer</button>
-            <p id="mob-score"></p>
-
-            <h3>Évolution du score /100</h3>
-            <div id="mob-graphique"></div>
-
-            <h3>Routines</h3>
-            <button id="btn-echauffement" class="btn-secondaire">Échauffement</button>
-            <button id="btn-etirement" class="btn-secondaire">Étirements</button>
-            <ul id="routine-liste"></ul>
-        </div>
         <div id="page-profil" class="page">
                     <button id="btn-retour-profil" class="btn-tertiaire">← Retour</button>
                     <h2>Profil / Progression</h2>
@@ -332,6 +286,16 @@
                 <button id="btn-vider-recherche" aria-label="Vider la recherche" hidden>✕</button>
             </div>
             <div id="selecteur-filtres"></div>
+            <button id="btn-creer-exo" class="btn-tertiaire">+ Créer un exercice</button>
+            <form id="form-creer-exo" hidden>
+                <input id="creer-exo-nom" type="text" placeholder="Nom de l'exercice" maxlength="60" required>
+                <select id="creer-exo-muscle" aria-label="Muscle"></select>
+                <select id="creer-exo-materiel" aria-label="Matériel"></select>
+                <div class="creer-exo-actions">
+                    <button type="submit" class="btn-primaire">Ajouter</button>
+                    <button type="button" id="btn-annuler-creer-exo" class="btn-tertiaire">Annuler</button>
+                </div>
+            </form>
             <ul id="selecteur-liste"></ul>
         </div>
 

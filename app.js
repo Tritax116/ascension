@@ -15,9 +15,15 @@ let filtreMuscle = null;
 let verrouEcran = null;
 let seanceEnCours = JSON.parse(localStorage.getItem("seanceEnCours")) || null;
 let finRepos = 0;
-const DUREES_REPOS = [60, 90, 120, 180];
+const PAS_REPOS = 15;
+const REPOS_MIN = 15;
+const REPOS_MAX = 600;
 let reposExos = JSON.parse(localStorage.getItem("reposExos")) || {};
 let exosRecents = JSON.parse(localStorage.getItem("exosRecents")) || [];
+let exosPerso = JSON.parse(localStorage.getItem("exosPerso")) || [];
+for (let i = 0; i < exosPerso.length; i++) {
+    EXERCICES.push(exosPerso[i]);
+}
 let filtresSelecteur = { muscle: null, materiel: null };
 let modeCarte = "volume";
 const FOURCHETTE_REPS = { min: 8, max: 12 };
@@ -136,7 +142,6 @@ if (!etat.muscu) etat.muscu = [];
 if (!etat.course) etat.course = [];
 if (!etat.history) etat.history = {};
 if (etat.poids === undefined) etat.poids = 70;
-if (!etat.mobilite) etat.mobilite = [];
 if (!etat.seances) etat.seances = [];
 if (!etat.nutrition) etat.nutrition = { objectif: 2200, repas: [] };
 let rangs = [
@@ -163,6 +168,7 @@ function exporterDonnees() {
         version: 1,
         exporteLe: new Date().toISOString(),
         etat: etat,
+        exercicesPerso: exosPerso,
         seanceEnCours: seanceEnCours
     };
     const contenu = JSON.stringify(sauvegarde, null, 2);
@@ -231,7 +237,6 @@ document.getElementById("btn-pause-course").addEventListener("click", togglePaus
 document.getElementById("btn-stop-course").addEventListener("click", terminerCourse);
 document.getElementById("btn-hydra").addEventListener("click", logHydratation);
 document.getElementById("input-poids-perso").addEventListener("change", setPoids);
-document.getElementById("btn-mesurer-mobilite").addEventListener("click", mesurerMobilite);
 document.getElementById("btn-demarrer-seance").addEventListener("click", demarrerSeance);
 document.getElementById("btn-abandonner-seance").addEventListener("click", abandonnerSeance);
 document.getElementById("btn-ajouter-exo").addEventListener("click", ouvrirSelecteur);
@@ -239,9 +244,6 @@ document.getElementById("btn-fermer-selecteur").addEventListener("click", fermer
 document.getElementById("btn-terminer-seance").addEventListener("click", terminerSeance);
 document.getElementById("btn-toggle-vue").addEventListener("click", toggleVue);
 document.getElementById("btn-nutri-chercher").addEventListener("click", chercherAliment);
-document.getElementById("btn-echauffement").addEventListener("click", function () {
-    afficherRoutine("echauffement");
-});
 const champRecherche = document.getElementById("selecteur-recherche");
 const boutonVider = document.getElementById("btn-vider-recherche");
 
@@ -256,9 +258,6 @@ boutonVider.addEventListener("click", function() {
     renderSelecteur();
     champRecherche.focus();
 });
-document.getElementById("btn-etirement").addEventListener("click", function () {
-    afficherRoutine("etirement");
-});
 document.getElementById("btn-header-profil").addEventListener("click", function () {
     changerPage("profil");
 });
@@ -271,16 +270,6 @@ const boutonsVue = document.querySelectorAll(".vue-muscle");
 for (let i = 0; i < boutonsVue.length; i++) {
     boutonsVue[i].addEventListener("click", function () {
         changerVueMuscle(boutonsVue[i].dataset.vue);
-    });
-}
-const boutonsNote = document.querySelectorAll(".btn-note");
-for (let i = 0; i < boutonsNote.length; i++) {
-    boutonsNote[i].addEventListener("click", function () {
-        const freres = boutonsNote[i].parentElement.querySelectorAll(".btn-note");
-        for (let j = 0; j < freres.length; j++) {
-            freres[j].classList.remove("actif");
-        }
-        boutonsNote[i].classList.add("actif");
     });
 }
 genererQueteDuJour();
@@ -336,7 +325,6 @@ function render() {
     renderQuete();
     renderHydratation();
     colorerMuscles();
-    renderMobilite();
     verifierBadges();
     renderBadges();
     renderSeance();
@@ -978,35 +966,6 @@ function setPoids() {
     render();
 }
 
-function mesurerMobilite() {
-    const s = noteSelectionnee("sel-souplesse");
-    const sq = noteSelectionnee("sel-squat");
-    const ep = noteSelectionnee("sel-epaules");
-    const score = Math.round((s + sq + ep) / 15 * 100);
-    etat.mobilite.push({ date: todayStr(), score: score });
-    save();
-    renderMobilite();
-}
-
-function renderMobilite() {
-    if (etat.mobilite.length === 0) {
-        document.getElementById("mob-score").textContent = "Fais ton premier test pour établir ton score.";
-        return;
-    }
-    const dernier = etat.mobilite[etat.mobilite.length - 1];
-    document.getElementById("mob-score").textContent = "Score de mobilité : " + dernier.score + " / 100";
-    const graph = document.getElementById("mob-graphique");
-    graph.innerHTML = "";
-    for (let i = 0; i < etat.mobilite.length; i++) {
-        const barre = document.createElement("div");
-        barre.className = "mob-barre";
-        barre.style.height = etat.mobilite[i].score + "%";
-        barre.textContent = etat.mobilite[i].score;
-        barre.title = etat.mobilite[i].date + " : " + etat.mobilite[i].score;
-        graph.appendChild(barre);
-    }
-}
-
 function xpProchainStade() {
     const rang = getRang();
     for (let i = rang.index + 1; i < rangs.length; i++) {
@@ -1037,14 +996,6 @@ function majEtatCourse(enCourse) {
         document.getElementById("btn-pause-course").hidden = true;
         document.getElementById("btn-stop-course").hidden = true;
     }
-}
-
-function noteSelectionnee(idSelecteur) {
-    const actif = document.querySelector("#" + idSelecteur + " .btn-note.actif");
-    if (actif) {
-        return Number(actif.dataset.note);
-    }
-    return 0;
 }
 
 function celebrer(message) {
@@ -1220,7 +1171,56 @@ function ajouterSection(liste, titre, exercices) {
     }
 }
 
+function remplirListe(select, noms) {
+    select.innerHTML = "";
+    for (const cle in noms) {
+        const option = document.createElement("option");
+        option.value = cle;
+        option.textContent = noms[cle];
+        select.appendChild(option);
+    }
+}
+
+function afficherFormCreerExo(afficher) {
+    document.getElementById("form-creer-exo").hidden = !afficher;
+    document.getElementById("btn-creer-exo").hidden = afficher;
+    if (afficher) {
+        remplirListe(document.getElementById("creer-exo-muscle"), NOMS_MUSCLES);
+        remplirListe(document.getElementById("creer-exo-materiel"), NOMS_MATERIEL);
+        document.getElementById("creer-exo-nom").value = document.getElementById("selecteur-recherche").value;
+        document.getElementById("creer-exo-nom").focus();
+    }
+}
+
+function creerExercicePerso(evenement) {
+    evenement.preventDefault();
+    const nom = document.getElementById("creer-exo-nom").value.trim();
+    if (nom === "") {
+        return;
+    }
+    const ex = {
+        id: "perso-" + normaliser(nom).replace(/[^a-z0-9]+/g, "-") + "-" + Date.now().toString(36),
+        nom: nom,
+        muscle: document.getElementById("creer-exo-muscle").value,
+        materiel: document.getElementById("creer-exo-materiel").value
+    };
+    exosPerso.push(ex);
+    EXERCICES.push(ex);
+    localStorage.setItem("exosPerso", JSON.stringify(exosPerso));
+    afficherFormCreerExo(false);
+    choisirExercice(ex);
+}
+
+document.getElementById("btn-creer-exo").addEventListener("click", function() {
+    afficherFormCreerExo(true);
+});
+document.getElementById("btn-annuler-creer-exo").addEventListener("click", function() {
+    afficherFormCreerExo(false);
+});
+document.getElementById("form-creer-exo").addEventListener("submit", creerExercicePerso);
+
 function ouvrirSelecteur(){
+    afficherFormCreerExo(false);
     document.getElementById("selecteur-recherche").value ="";
     filtresSelecteur = { muscle: null, materiel: null };
     renderSelecteur();
@@ -1288,12 +1288,12 @@ function choisirExercice(ex) {
 }
 
 function creerSerie(exo) {
-    const precedentes = seriesPrecedentes(exo.id);
-    const rang = exo.series.length;
-
-    let modele = precedentes[rang];
-    if (!modele && exo.series.length > 0) {
+    // La derniere serie de cette seance prime sur celle de la seance d'avant.
+    let modele = null;
+    if (exo.series.length > 0) {
         modele = exo.series[exo.series.length - 1];
+    } else {
+        modele = seriesPrecedentes(exo.id)[0];
     }
 
     return {
@@ -1391,9 +1391,8 @@ function reposPour(idExo) {
     return 90;
 }
 
-function changerReposExo(idExo) {
-    const position = DUREES_REPOS.indexOf(reposPour(idExo));
-    reposExos[idExo] = DUREES_REPOS[(position + 1) % DUREES_REPOS.length];
+function changerReposExo(idExo, delta) {
+    reposExos[idExo] = Math.min(REPOS_MAX, Math.max(REPOS_MIN, reposPour(idExo) + delta));
     localStorage.setItem("reposExos", JSON.stringify(reposExos));
     renderSeance();
 }
@@ -1585,16 +1584,28 @@ function renderSeance() {
             supprimerExercice(i);
         });
 
-        const btnRepos = document.createElement("button");
-        btnRepos.className = "btn-repos-exo";
-        btnRepos.textContent = "⏱ " + reposPour(exo.id) + " s";
-        btnRepos.setAttribute("aria-label", "Changer le temps de repos de cet exercice");
-        btnRepos.addEventListener("click", function() {
-            changerReposExo(exo.id);
+        const repos = document.createElement("div");
+        repos.className = "repos-exo";
+        const moins = document.createElement("button");
+        moins.textContent = "−";
+        moins.setAttribute("aria-label", "Repos moins 15 secondes");
+        moins.addEventListener("click", function() {
+            changerReposExo(exo.id, -PAS_REPOS);
         });
+        const valeurRepos = document.createElement("span");
+        valeurRepos.textContent = "⏱ " + reposPour(exo.id) + " s";
+        const plus = document.createElement("button");
+        plus.textContent = "+";
+        plus.setAttribute("aria-label", "Repos plus 15 secondes");
+        plus.addEventListener("click", function() {
+            changerReposExo(exo.id, PAS_REPOS);
+        });
+        repos.appendChild(moins);
+        repos.appendChild(valeurRepos);
+        repos.appendChild(plus);
 
         tete.appendChild(titre);
-        tete.appendChild(btnRepos);
+        tete.appendChild(repos);
         tete.appendChild(btnSuppr);
         bloc.appendChild(tete);
 
@@ -1658,6 +1669,7 @@ precedent.textContent = avant ? avant.poids + "×" + avant.reps : "–";
             champKg.value = serie.kg;
             champKg.addEventListener("input", function() {
                 serie.kg = champKg.value;
+                serie.touche = true;
                 sauverSeance();
             });
 
@@ -1667,6 +1679,7 @@ precedent.textContent = avant ? avant.poids + "×" + avant.reps : "–";
             champReps.value = serie.reps;
             champReps.addEventListener("input", function() {
                 serie.reps = champReps.value;
+                serie.touche = true;
                 sauverSeance();
             });
 
@@ -1687,6 +1700,13 @@ precedent.textContent = avant ? avant.poids + "×" + avant.reps : "–";
                 serie.fait = !serie.fait;
                 serie.pr = false;
                 if (serie.fait) {
+                    // Les series suivantes que Kylian n'a pas encore modifiees reprennent kg x reps.
+                    for (let k = j + 1; k < exo.series.length; k++) {
+                        if (!exo.series[k].fait && !exo.series[k].touche) {
+                            exo.series[k].kg = serie.kg;
+                            exo.series[k].reps = serie.reps;
+                        }
+                    }
                     seanceEnCours.fin = Date.now();
                     finRepos = Date.now() + reposPour(exo.id) * 1000;
 
@@ -1725,7 +1745,7 @@ precedent.textContent = avant ? avant.poids + "×" + avant.reps : "–";
 
         liste.appendChild(bloc);
     }
-    document.getElementById("seance-volume").textContent = volume + " kg";
+    document.getElementById("seance-volume").textContent = Math.round(volume) + " kg";
     document.getElementById("seance-series").textContent = nbSeries + (nbSeries > 1 ? " séries" : " série");
 }
 
@@ -1803,7 +1823,7 @@ function terminerSeance() {
     etat.seances.push({
         date: todayStr(),
         duree: duree,
-        volume: volume,
+        volume: Math.round(volume),
         series: series
     });
     for (let i = 0; i < series.length; i++) {
@@ -1899,22 +1919,6 @@ function renderSeances() {
     }
 }
 
-const routinesMobilite = {
-    echauffement: ["Rotations d'épaules — 30s", "Balancers de jambes — 30s", "Squats au poids du corps — 10 reps", "Cercles de hanches — 30s"],
-    etirement: ["Étirement ischios — 30s", "Étirement quadriceps — 30s/jambe", "Étirement épaules — 30s", "Chat-vache — 1 min"]
-};
-
-function afficherRoutine(type) {
-    const liste = document.getElementById("routine-liste");
-    liste.innerHTML = "";
-    const routine = routinesMobilite[type];
-    for (let i = 0; i < routine.length; i++) {
-        const li = document.createElement("li");
-        li.textContent = routine[i];
-        liste.appendChild(li);
-    }
-}
-
 function toggleVue() {
     const acceuil = document.getElementById("page-accueil");
     acceuil.classList.toggle("mode-liste");
@@ -1947,16 +1951,10 @@ function renderModules() {
     for (let i = 0; i < etat.hydratation.prises.length; i++) {
         eauTotal += etat.hydratation.prises[i].ml;
     }
-    let mobScore = 0;
-    if (etat.mobilite.length > 0) {
-        mobScore = etat.mobilite[etat.mobilite.length - 1].score;
-    }
-
     const modules = [
         { nom: "Muscu", pct: etat.seances.length / 5 * 100 },
         { nom: "Course", pct: etat.course.length / 3 * 100 },
-        { nom: "Hydratation", pct: eauTotal / etat.hydratation.objectif * 100 },
-        { nom: "Mobilité", pct: mobScore }
+        { nom: "Hydratation", pct: eauTotal / etat.hydratation.objectif * 100 }
     ];
 
     const RAYON = 42;
@@ -2014,8 +2012,7 @@ function renderCalendrierModules() {
     conteneur.innerHTML = "";
     const modules = [
         { nom: "Muscu", data: etat.muscu, couleur: "#8C8B5E" },
-        { nom: "Course", data: etat.course, couleur: "#8C8B5E" },
-        { nom: "Mobilité", data: etat.mobilite, couleur: "#8C8B5E" }
+        { nom: "Course", data: etat.course, couleur: "#8C8B5E" }
     ];
     for (let m = 0; m < modules.length; m++) {
         const mod = modules[m];
