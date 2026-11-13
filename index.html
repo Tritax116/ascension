@@ -14,8 +14,8 @@
     <body>
         <div id="lock-screen">
             <p id="quote">citation ici</p>
-            <h1>pas de manette avant....</h1>
-            <button id="btn-presence">j'ai pas fait....</button>
+            <h1>Prêt à t'entraîner ?</h1>
+            <button id="btn-presence">Je suis là</button>
         </div>
         <div id="dashboard" hidden>
             <header id="app-header">
@@ -34,6 +34,13 @@
 
         <div id="page-accueil" class="page actif">
             <p id="message-coach"></p>
+            <div id="carte-poids" class="prochaine-seance" hidden>
+                <span class="prochaine-texte">Quel est ton poids ? Il sert à calculer ton objectif d'eau.</span>
+                <div class="poids-saisie">
+                    <input id="input-poids-accueil" type="text" inputmode="decimal" placeholder="kg" autocomplete="off">
+                    <button id="btn-poids-ok" class="btn-primaire">OK</button>
+                </div>
+            </div>
             <div id="prochaine-seance-accueil" class="prochaine-seance"></div>
 
             <div id="hero">
@@ -48,8 +55,6 @@
             </div>
 
             <div id="streak-semaine"></div>
-
-            <button id="btn-full-session" class="btn-primaire">Séance complète</button>
 
             <div id="quete-du-jour">
                 <h3>Quête du jour</h3>
@@ -90,6 +95,11 @@
                 </div>
             </section>
 
+<h3>Séances terminées</h3>
+<ul id="seances-historique"></ul>
+<button id="btn-histo-voir-tout" class="btn-tertiaire" hidden></button>
+
+<h3>Carte des muscles</h3>
 <div class="modes-carte">
     <button data-mode="volume" class="mode-carte on">Volume</button>
     <button data-mode="recup" class="mode-carte">Récupération</button>
@@ -179,9 +189,6 @@
                 <ul id="liste-exercice"></ul>
             </div>
 
-            <h3>Séances terminées</h3>
-            <ul id="seances-historique"></ul>
-
             <div id="detail-muscle" hidden>
                 <button id="btn-retour-muscle">← Retour</button>
                 <h2 id="detail-nom">Muscle</h2>
@@ -207,6 +214,14 @@
                         <div id="page-nutrition" class="page">
             <h2>Nutrition</h2>
 
+            <h3>Ajouter un aliment</h3>
+            <div class="nutri-recherche">
+                <input id="nutri-input" type="text" placeholder="Chercher un aliment...">
+                <button id="btn-nutri-chercher" class="btn-primaire">Chercher</button>
+            </div>
+            <ul id="nutri-resultats"></ul>
+
+
             <div class="nutri-resume">
                 <p id="nutri-calories"></p>
                 <div class="quete-barre">
@@ -229,12 +244,6 @@
                 <p id="rappel-hydra"></p>
             </div>
 
-            <h3>Ajouter un aliment</h3>
-            <div class="nutri-recherche">
-                <input id="nutri-input" type="text" placeholder="Chercher un aliment...">
-                <button id="btn-nutri-chercher" class="btn-primaire">Chercher</button>
-            </div>
-            <ul id="nutri-resultats"></ul>
         </div>
 
         <div id="page-profil" class="page">
@@ -252,7 +261,7 @@
 
                     <h3>Fiche</h3>
                     <div id="fiche-perso">
-                        <label>Poids (kg) : <input type="number" id="input-poids-perso"></label>
+                        <label>Poids (kg) : <input type="text" inputmode="decimal" id="input-poids-perso" autocomplete="off"></label>
                     </div>
                     <p id="fiche-classe"></p>
                     <p id="fiche-titre"></p>
@@ -260,18 +269,29 @@
                     <h3>Données</h3>
                     <p class="aide-texte">Télécharge une copie de toutes tes données (séances, XP, badges). À faire de temps en temps : ton historique ne vit que sur cet appareil.</p>
                     <button id="btn-export" class="btn-secondaire">Exporter mes données</button>
+                    <button id="btn-import" class="btn-secondaire">Importer une sauvegarde</button>
+                    <input id="input-import" type="file" accept="application/json,.json" hidden>
                 </div>
                 <div id="page-seance" class="page">
+    <button id="btn-sortir-seance" class="btn-tertiaire">← Quitter l'écran (la séance continue)</button>
     <div id="seance-entete">
         <span id="seance-duree">00:00</span>
         <span id="seance-volume">0 kg</span>
         <span id="seance-series">0 séries</span>
-        <span id="seance-repos"></span>
     </div>
     <button id="btn-ajouter-exo" class="btn-secondaire">+ Ajouter un exercice</button>
     <ul id="seance-liste"></ul>
     <button id="btn-terminer-seance" class="btn-primaire">Terminer</button>
     <button id="btn-abandonner-seance" class="btn-tertiaire">Abandonner</button>
+    <div id="barre-repos" hidden>
+        <div id="barre-repos-fill"></div>
+        <span id="barre-repos-temps">00:00</span>
+        <div class="barre-repos-boutons">
+            <button id="repos-moins" class="btn-tertiaire">−15 s</button>
+            <button id="repos-plus" class="btn-tertiaire">+15 s</button>
+            <button id="repos-passer" class="btn-secondaire">Passer</button>
+        </div>
+    </div>
 </div>
             </div>  
         
@@ -297,6 +317,17 @@
                 </div>
             </form>
             <ul id="selecteur-liste"></ul>
+        </div>
+
+        <div id="dialogue" hidden>
+            <div id="dialogue-boite" role="dialog" aria-modal="true">
+                <p id="dialogue-message"></p>
+                <input id="dialogue-champ" type="text" inputmode="decimal" autocomplete="off" hidden>
+                <div id="dialogue-actions">
+                    <button id="dialogue-annuler" class="btn-tertiaire">Annuler</button>
+                    <button id="dialogue-ok" class="btn-primaire">OK</button>
+                </div>
+            </div>
         </div>
 
         <div id="celebration" hidden>

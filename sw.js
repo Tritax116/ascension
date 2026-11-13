@@ -1,4 +1,4 @@
-const CACHE = "ascension-v9";
+const CACHE = "ascension-v10";
 const FICHIERS = [
     "index.html",
     "style.css",
@@ -29,7 +29,21 @@ self.addEventListener("activate", function(e){
 
 self.addEventListener("fetch", function(e){
     if (e.request.method !== "GET"){ return; }
-    if (new URL(e.request.url).origin !== self.location.origin){ return; }
+    const url = new URL(e.request.url);
+    if (url.hostname === "cdnjs.cloudflare.com"){
+        // Leaflet : cache d'abord, pour que la carte marche sans reseau
+        e.respondWith(
+            caches.match(e.request).then(function(deja){
+                return deja || fetch(e.request).then(function(reponse){
+                    const copie = reponse.clone();
+                    caches.open(CACHE).then(function(c){ c.put(e.request, copie); });
+                    return reponse;
+                });
+            })
+        );
+        return;
+    }
+    if (url.origin !== self.location.origin){ return; }
     if (e.request.url.indexOf("/.netlify/functions/") !== -1){ return; }
 
     e.respondWith(

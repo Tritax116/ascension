@@ -18,6 +18,10 @@ let finRepos = 0;
 const PAS_REPOS = 15;
 const REPOS_MIN = 15;
 const REPOS_MAX = 600;
+let totalRepos = 0;
+let contexteAudio = null;
+let dialogueResolve = null;
+let historiqueComplet = false;
 let reposExos = JSON.parse(localStorage.getItem("reposExos")) || {};
 let exosRecents = JSON.parse(localStorage.getItem("exosRecents")) || [];
 let exosPerso = JSON.parse(localStorage.getItem("exosPerso")) || [];
@@ -162,6 +166,38 @@ let rangs = [
     { nom: "Diamant", division: "I", seuil: 9200, couleur: "#A78BFA" },
 ];
 
+function importerDonnees(fichier) {
+    const lecteur = new FileReader();
+    lecteur.onload = function () {
+        let donnees = null;
+        try {
+            donnees = JSON.parse(lecteur.result);
+        } catch (erreur) {
+            informer("Ce fichier n'est pas une sauvegarde valide.");
+            return;
+        }
+        if (!donnees || donnees.application !== "Ascension" || !donnees.etat) {
+            informer("Ce fichier n'est pas une sauvegarde Ascension.");
+            return;
+        }
+        const date = donnees.exporteLe ? donnees.exporteLe.slice(0, 10) : "date inconnue";
+        confirmer("Remplacer toutes tes données actuelles par la sauvegarde du " + date + " ?", "Remplacer").then(function (ok) {
+            if (!ok) {
+                return;
+            }
+            localStorage.setItem("etat", JSON.stringify(donnees.etat));
+            localStorage.setItem("exosPerso", JSON.stringify(donnees.exercicesPerso || []));
+            if (donnees.seanceEnCours) {
+                localStorage.setItem("seanceEnCours", JSON.stringify(donnees.seanceEnCours));
+            } else {
+                localStorage.removeItem("seanceEnCours");
+            }
+            location.reload();
+        });
+    };
+    lecteur.readAsText(fichier);
+}
+
 function exporterDonnees() {
     const sauvegarde = {
         application: "Ascension",
@@ -184,8 +220,11 @@ function exporterDonnees() {
 }
 
 function save() {
-    localStorage.setItem("etat", JSON.stringify(etat));
-
+    try {
+        localStorage.setItem("etat", JSON.stringify(etat));
+    } catch (erreur) {
+        informer("Stockage plein : exporte tes données (Profil), puis supprime d'anciennes courses.");
+    }
 }
 
 const citations = [
@@ -231,7 +270,6 @@ for (let i = 0; i < boutonsOnglets.length; i++) {
 }
 
 document.getElementById("btn-presence").addEventListener("click", markPresence);
-document.getElementById("btn-full-session").addEventListener("click", markFullSession);
 document.getElementById("btn-start-course").addEventListener("click", demarrerCourse);
 document.getElementById("btn-pause-course").addEventListener("click", togglePause);
 document.getElementById("btn-stop-course").addEventListener("click", terminerCourse);
@@ -265,6 +303,55 @@ document.getElementById("btn-retour-profil").addEventListener("click", function 
     changerPage("accueil");
 });
 document.getElementById("btn-export").addEventListener("click", exporterDonnees);
+document.getElementById("btn-import").addEventListener("click", function () {
+    document.getElementById("input-import").click();
+});
+document.getElementById("input-import").addEventListener("change", function (evenement) {
+    const fichier = evenement.target.files[0];
+    evenement.target.value = "";
+    if (fichier) {
+        importerDonnees(fichier);
+    }
+});
+document.getElementById("btn-poids-ok").addEventListener("click", function () {
+    appliquerPoids(Number(String(document.getElementById("input-poids-accueil").value).replace(",", ".")));
+});
+document.getElementById("btn-histo-voir-tout").addEventListener("click", function () {
+    historiqueComplet = !historiqueComplet;
+    renderSeances();
+});
+document.getElementById("repos-moins").addEventListener("click", function () {
+    ajusterRepos(-15);
+});
+document.getElementById("repos-plus").addEventListener("click", function () {
+    ajusterRepos(15);
+});
+document.getElementById("repos-passer").addEventListener("click", passerRepos);
+document.getElementById("btn-sortir-seance").addEventListener("click", function () {
+    changerPage("muscu");
+});
+document.getElementById("dialogue-ok").addEventListener("click", function () {
+    const champ = document.getElementById("dialogue-champ");
+    fermerDialogue(champ.hidden ? true : champ.value);
+});
+document.getElementById("dialogue-annuler").addEventListener("click", function () {
+    fermerDialogue(null);
+});
+document.getElementById("dialogue").addEventListener("click", function (evenement) {
+    if (evenement.target.id === "dialogue") {
+        fermerDialogue(null);
+    }
+});
+document.addEventListener("keydown", function (evenement) {
+    if (document.getElementById("dialogue").hidden) {
+        return;
+    }
+    if (evenement.key === "Escape") {
+        fermerDialogue(null);
+    } else if (evenement.key === "Enter") {
+        document.getElementById("dialogue-ok").click();
+    }
+});
 const boutonsVue = document.querySelectorAll(".vue-muscle");
 
 for (let i = 0; i < boutonsVue.length; i++) {
@@ -320,8 +407,10 @@ function render() {
     document.getElementById("avatar").innerHTML = '<img src="avatar-pixel-' + stageAvatar + '.png" alt="avatar">'; document.getElementById("fiche-classe").textContent = "Classe : " + calculerClasse();
     document.getElementById("fiche-titre").textContent = "Titre : " + calculerTitre();
     document.getElementById("message-coach").textContent = messageCoach();
+    document.getElementById("carte-poids").hidden = !!etat.poidsDefini;
     renderCourse();
     renderMuscu();
+    majQueteAuto();
     renderQuete();
     renderHydratation();
     colorerMuscles();
@@ -353,21 +442,6 @@ function getLevel(xp) {
         return "Recrue";
     }
 }
-
-function markFullSession() {
-    const hoy = todayStr();
-    if (!etat.history[hoy]) {
-        etat.history[hoy] = { presence: true };
-    }
-    if (etat.history[hoy].full) {
-        return;
-    }
-    etat.history[hoy].full = true;
-    etat.xp += 25;
-    render();
-    save();
-}
-
 
 function xpProgress(xp) {
     if (xp >= 1000) {
@@ -513,25 +587,36 @@ function togglePause() {
     }
 }
 
+// Le trace GPS complet remplirait vite localStorage : on garde 300 points au plus.
+function simplifierTrace(points, max) {
+    if (points.length <= max) {
+        return points.slice();
+    }
+    const pas = points.length / max;
+    const resultat = [];
+    for (let i = 0; i < max; i++) {
+        resultat.push(points[Math.floor(i * pas)]);
+    }
+    resultat.push(points[points.length - 1]);
+    return resultat;
+}
+
 function terminerCourse() {
     navigator.geolocation.clearWatch(suiviId);
     clearInterval(intervalId);
     const dureeMinutes = (Date.now() - debutCourse) / 1000 / 60;
-    etat.course.push({
-        distance: distanceCourse,
-        duree: dureeMinutes,
-        date: todayStr(),
-        allure: distanceCourse > 0 ? dureeMinutes / distanceCourse : 0,
-        trace: pointsTrace.slice()
-    });
-    let bonusXp = distanceCourse * 10;
-    if (bonusXp > 80) {
-        bonusXp = 80;
+    if (distanceCourse < 0.1) {
+        informer("Course trop courte (moins de 100 m) : elle n'est pas enregistrée.");
+    } else {
+        etat.course.push({
+            distance: distanceCourse,
+            duree: dureeMinutes,
+            date: todayStr(),
+            allure: dureeMinutes / distanceCourse,
+            trace: simplifierTrace(pointsTrace, 300)
+        });
+        etat.xp += Math.min(80, Math.max(15, distanceCourse * 10));
     }
-    if (bonusXp < 15) {
-        bonusXp = 15;
-    }
-    etat.xp += bonusXp;
     document.getElementById("course-temps").textContent = "Temps : 00:00";
     document.getElementById("course-allure").textContent = "Allure : -- /km";
     document.getElementById("course-distance").textContent = "Distance : 0.00 km";
@@ -654,6 +739,7 @@ function changerPage(nom) {
         pages[i].classList.remove("actif");
     }
     document.getElementById("page-" + nom).classList.add("actif");
+    document.body.classList.toggle("en-seance", nom === "seance");
     const onglets = document.querySelectorAll(".onglet");
     for (let i = 0; i < onglets.length; i++) {
         onglets[i].classList.remove("actif");
@@ -814,25 +900,84 @@ document.getElementById("btn-retour-muscle").addEventListener("click", function 
     document.getElementById("detail-muscle").hidden = true;
 });
 
+function jourEntrainement() {
+    const jour = new Date().getDay();
+    return PROGRAMMES.some(function(p) {
+        return p.jour === jour;
+    });
+}
+
 function genererQueteDuJour() {
-    if (etat.quete && etat.quete.date === todayStr()) {
+    const ancienne = etat.quete;
+    const aujourdhui = todayStr();
+    if (ancienne && ancienne.date === aujourdhui && ancienne.objectifs[0] && ancienne.objectifs[0].cle) {
         return;
     }
     let penalite = false;
-    if (etat.quete && !etat.quete.faite) {
-        penalite = true;
+    if (ancienne) {
+        penalite = ancienne.date === aujourdhui ? !!ancienne.penalite : !ancienne.faite;
     }
-    const cible = penalite ? 150 : 100;
+    const objectifs = [];
+    if (jourEntrainement()) {
+        objectifs.push({ cle: "seance", nom: "Séance du jour", cible: 1, actuel: 0 });
+        objectifs.push({ cle: "series", nom: "Séries validées", cible: penalite ? 15 : 10, actuel: 0 });
+    }
+    objectifs.push({ cle: "eau", nom: "Hydratation", cible: Math.round(etat.poids * 33), actuel: 0, unite: " ml" });
     etat.quete = {
-        date: todayStr(),
+        date: aujourdhui,
         penalite: penalite,
-        objectifs: [
-            { nom: "Pompes", cible: cible, actuel: 0 },
-            { nom: "Abdos", cible: cible, actuel: 0 },
-            { nom: "Squats", cible: cible, actuel: 0 }
-        ]
+        objectifs: objectifs,
+        faite: !!(ancienne && ancienne.date === aujourdhui && ancienne.faite)
     };
     save();
+}
+
+// Les objectifs se remplissent tout seuls a partir de ce que l'app a vraiment enregistre.
+function majQueteAuto() {
+    const quete = etat.quete;
+    if (!quete) {
+        return;
+    }
+    const aujourdhui = todayStr();
+    let nbSeances = 0;
+    let nbSeries = 0;
+    for (let i = 0; i < etat.seances.length; i++) {
+        if (etat.seances[i].date === aujourdhui) {
+            nbSeances++;
+            nbSeries += etat.seances[i].series.length;
+        }
+    }
+    let eau = 0;
+    if (etat.hydratation && etat.hydratation.date === aujourdhui) {
+        for (let i = 0; i < etat.hydratation.prises.length; i++) {
+            eau += etat.hydratation.prises[i].ml;
+        }
+    }
+    let toutFait = true;
+    for (let i = 0; i < quete.objectifs.length; i++) {
+        const objectif = quete.objectifs[i];
+        let valeur = 0;
+        if (objectif.cle === "seance") {
+            valeur = nbSeances;
+        } else if (objectif.cle === "series") {
+            valeur = nbSeries;
+        } else if (objectif.cle === "eau") {
+            valeur = eau;
+            if (etat.hydratation && etat.hydratation.objectif) {
+                objectif.cible = etat.hydratation.objectif;
+            }
+        }
+        objectif.actuel = Math.min(valeur, objectif.cible);
+        if (objectif.actuel < objectif.cible) {
+            toutFait = false;
+        }
+    }
+    if (toutFait && !quete.faite) {
+        quete.faite = true;
+        etat.xp += 30;
+        save();
+        celebrer("Quête du jour complétée ! +30xp");
+    }
 }
 
 function renderQuete() {
@@ -848,7 +993,7 @@ function renderQuete() {
         const ligne = document.createElement("li");
 
         const label = document.createElement("div");
-        label.textContent = obj.nom + " " + obj.actuel + " / " + obj.cible;
+        label.textContent = obj.nom + " " + obj.actuel + " / " + obj.cible + (obj.unite || "");
 
         const barre = document.createElement("div");
         barre.className = "quete-barre";
@@ -857,16 +1002,8 @@ function renderQuete() {
         remplissage.style.width = (obj.actuel / obj.cible * 100) + "%";
         barre.appendChild(remplissage);
 
-        const bouton = document.createElement("button");
-        bouton.className = "quete-plus";
-        bouton.textContent = "+10";
-        bouton.addEventListener("click", function () {
-            incrementerObjectif(i);
-        });
-
         ligne.appendChild(label);
         ligne.appendChild(barre);
-        ligne.appendChild(bouton);
         liste.appendChild(ligne);
     }
     if (etat.quete.faite) {
@@ -874,34 +1011,6 @@ function renderQuete() {
     } else {
         document.getElementById("streak-alerte").textContent = "Quête du jour en cours — ton streak compte sur toi.";
     }
-}
-
-function incrementerObjectif(i) {
-    etat.quete.objectifs[i].actuel += 10;
-    if (etat.quete.objectifs[i].actuel > etat.quete.objectifs[i].cible) {
-        etat.quete.objectifs[i].actuel = etat.quete.objectifs[i].cible;
-    }
-    save();
-    renderQuete();
-    verifierQueteComplete();
-}
-
-function verifierQueteComplete() {
-    if (etat.quete.faite) {
-        return;
-    }
-    for (let i = 0; i < etat.quete.objectifs.length; i++) {
-        if (etat.quete.objectifs[i].actuel < etat.quete.objectifs[i].cible) {
-            return;
-
-        }
-
-    }
-    etat.quete.faite = true;
-    etat.xp += 30;
-    celebrer("Quête du jour complétée ! +30xp");
-    render();
-    save();
 }
 
 function tempsRestantQuete() {
@@ -956,14 +1065,23 @@ function logHydratation() {
     const heure = pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds());
     etat.hydratation.prises.push({ ml: 300, heure: heure });
     save();
-    renderHydratation();
+    render();
+}
+
+function appliquerPoids(poids) {
+    if (!(poids >= 30 && poids <= 300)) {
+        informer("Entre un poids entre 30 et 300 kg.");
+        return;
+    }
+    etat.poids = poids;
+    etat.poidsDefini = true;
+    etat.hydratation.objectif = Math.round(poids * 33);
+    save();
+    render();
 }
 
 function setPoids() {
-    etat.poids = Number(document.getElementById("input-poids-perso").value);
-    etat.hydratation.objectif = Math.round(etat.poids * 33);
-    save();
-    render();
+    appliquerPoids(Number(String(document.getElementById("input-poids-perso").value).replace(",", ".")));
 }
 
 function xpProchainStade() {
@@ -996,6 +1114,57 @@ function majEtatCourse(enCourse) {
         document.getElementById("btn-pause-course").hidden = true;
         document.getElementById("btn-stop-course").hidden = true;
     }
+}
+
+function ouvrirDialogue(message, options) {
+    if (dialogueResolve) {
+        return Promise.resolve(null);
+    }
+    options = options || {};
+    const champ = document.getElementById("dialogue-champ");
+    document.getElementById("dialogue-message").textContent = message;
+    champ.hidden = !options.champ;
+    champ.value = options.valeur !== undefined ? options.valeur : "";
+    document.getElementById("dialogue-ok").textContent = options.ok || "OK";
+    document.getElementById("dialogue-annuler").hidden = options.annuler === false;
+    document.getElementById("dialogue").hidden = false;
+    if (options.champ) {
+        champ.focus();
+        champ.select();
+    } else {
+        document.getElementById("dialogue-ok").focus();
+    }
+    return new Promise(function(resolve) {
+        dialogueResolve = resolve;
+    });
+}
+
+function fermerDialogue(valeur) {
+    document.getElementById("dialogue").hidden = true;
+    const resolve = dialogueResolve;
+    dialogueResolve = null;
+    if (resolve) {
+        resolve(valeur);
+    }
+}
+
+function confirmer(message, libelleOk) {
+    return ouvrirDialogue(message, { ok: libelleOk || "Confirmer" }).then(function(reponse) {
+        return reponse !== null;
+    });
+}
+
+function informer(message) {
+    return ouvrirDialogue(message, { annuler: false });
+}
+
+function demanderNombre(message, valeur) {
+    return ouvrirDialogue(message, { champ: true, valeur: valeur }).then(function(reponse) {
+        if (reponse === null) {
+            return null;
+        }
+        return Number(String(reponse).replace(",", "."));
+    });
 }
 
 function celebrer(message) {
@@ -1447,7 +1616,7 @@ function demarrerProgramme(index) {
 
 function refaireSeance(index) {
     if (seanceEnCours) {
-        alert("Termine ou abandonne ta séance en cours avant d'en refaire une.");
+        informer("Termine ou abandonne ta séance en cours avant d'en refaire une.");
         return;
     }
     const exercices = [];
@@ -1465,7 +1634,7 @@ function refaireSeance(index) {
         parId[s.id].series.push({ kg: String(s.poids), reps: String(s.reps), fait: false });
     }
     if (exercices.length === 0) {
-        alert("Cette séance n'a pas de détail à refaire.");
+        informer("Cette séance n'a pas de détail à refaire.");
         return;
     }
     seanceEnCours = { debut: Date.now(), exercices: exercices };
@@ -1516,20 +1685,24 @@ function renderProchaineSeance() {
 }
 
 function supprimerSerie(indexExo, indexSerie) {
-    if (!confirm("Supprimer la série " + (indexSerie + 1) + " ?")) {
-        return;
-    }
-    seanceEnCours.exercices[indexExo].series.splice(indexSerie, 1);
-    renderSeance();
+    confirmer("Supprimer la série " + (indexSerie + 1) + " ?", "Supprimer").then(function(ok) {
+        if (!ok) {
+            return;
+        }
+        seanceEnCours.exercices[indexExo].series.splice(indexSerie, 1);
+        renderSeance();
+    });
 }
 
 function supprimerExercice(indexExo) {
     const exo = seanceEnCours.exercices[indexExo];
-    if (!confirm("Retirer " + exo.nom + " de la séance ?")) {
-        return;
-    }
-    seanceEnCours.exercices.splice(indexExo, 1);
-    renderSeance();
+    confirmer("Retirer " + exo.nom + " de la séance ?", "Retirer").then(function(ok) {
+        if (!ok) {
+            return;
+        }
+        seanceEnCours.exercices.splice(indexExo, 1);
+        renderSeance();
+    });
 }
 
 function abandonnerSeance() {
@@ -1537,6 +1710,7 @@ function abandonnerSeance() {
     finRepos = 0;
     relacherEcran();
     sauverSeance();
+    majBarreRepos();
     changerPage("muscu");
 }
 
@@ -1653,9 +1827,26 @@ function renderSeance() {
             const numero = document.createElement("button");
             numero.className = "serie-num";
             numero.textContent = j + 1;
-            numero.setAttribute("aria-label", "Supprimer la série " + (j + 1));
-            numero.addEventListener("click", function() {
-                supprimerSerie(i, j);
+            numero.setAttribute("aria-label", "Série " + (j + 1) + " : maintiens pour supprimer");
+            let minuteurAppui = null;
+            numero.addEventListener("pointerdown", function() {
+                minuteurAppui = setTimeout(function() {
+                    minuteurAppui = null;
+                    if (navigator.vibrate) {
+                        navigator.vibrate(30);
+                    }
+                    supprimerSerie(i, j);
+                }, 600);
+            });
+            const annulerAppui = function() {
+                clearTimeout(minuteurAppui);
+                minuteurAppui = null;
+            };
+            numero.addEventListener("pointerup", annulerAppui);
+            numero.addEventListener("pointerleave", annulerAppui);
+            numero.addEventListener("pointercancel", annulerAppui);
+            numero.addEventListener("contextmenu", function(evenement) {
+                evenement.preventDefault();
             });
 
             const precedent = document.createElement("span");
@@ -1664,11 +1855,13 @@ function renderSeance() {
 precedent.textContent = avant ? avant.poids + "×" + avant.reps : "–";
 
             const champKg = document.createElement("input");
-            champKg.type = "number";
+            // Texte + clavier decimal : la virgule (62,5) est acceptee partout
+            champKg.type = "text";
             champKg.inputMode = "decimal";
+            champKg.setAttribute("autocomplete", "off");
             champKg.value = serie.kg;
             champKg.addEventListener("input", function() {
-                serie.kg = champKg.value;
+                serie.kg = champKg.value.replace(",", ".");
                 serie.touche = true;
                 sauverSeance();
             });
@@ -1709,6 +1902,8 @@ precedent.textContent = avant ? avant.poids + "×" + avant.reps : "–";
                     }
                     seanceEnCours.fin = Date.now();
                     finRepos = Date.now() + reposPour(exo.id) * 1000;
+                    totalRepos = reposPour(exo.id);
+                    preparerAudio();
 
                     let record = meilleurPoids(exo.id);
                     for (let k = 0; k < exo.series.length; k++) {
@@ -1747,10 +1942,12 @@ precedent.textContent = avant ? avant.poids + "×" + avant.reps : "–";
     }
     document.getElementById("seance-volume").textContent = Math.round(volume) + " kg";
     document.getElementById("seance-series").textContent = nbSeries + (nbSeries > 1 ? " séries" : " série");
+    majBarreRepos();
 }
 
 function majDureeSeance() {
     if (!seanceEnCours) {
+        document.getElementById("barre-repos").hidden = true;
         return;
     }
     const ecoule = Date.now() - seanceEnCours.debut;
@@ -1758,21 +1955,76 @@ function majDureeSeance() {
     const min = Math.floor(totalSec / 60);
     const sec = totalSec % 60;
     document.getElementById("seance-duree").textContent = pad(min) + ":" + pad(sec);
+    majBarreRepos();
+}
 
-    const zoneRepos = document.getElementById("seance-repos");
-    if (finRepos === 0) {
-        zoneRepos.textContent = "";
+function majBarreRepos() {
+    const barre = document.getElementById("barre-repos");
+    if (finRepos === 0 || !seanceEnCours) {
+        barre.hidden = true;
         return;
     }
     const restant = Math.ceil((finRepos - Date.now()) / 1000);
     if (restant > 0) {
-        zoneRepos.textContent = "Repos " + pad(Math.floor(restant / 60)) + ":" + pad(restant % 60);
+        barre.hidden = false;
+        document.getElementById("barre-repos-temps").textContent = pad(Math.floor(restant / 60)) + ":" + pad(restant % 60);
+        const part = totalRepos > 0 ? Math.min(restant / totalRepos, 1) : 0;
+        document.getElementById("barre-repos-fill").style.width = (part * 100) + "%";
     } else {
-        zoneRepos.textContent = "";
+        barre.hidden = true;
         finRepos = 0;
         if (navigator.vibrate) {
             navigator.vibrate([200, 100, 200]);
         }
+        bip();
+    }
+}
+
+function ajusterRepos(deltaSecondes) {
+    if (finRepos === 0) {
+        return;
+    }
+    finRepos += deltaSecondes * 1000;
+    totalRepos = Math.max(totalRepos + deltaSecondes, 1);
+    majBarreRepos();
+}
+
+function passerRepos() {
+    finRepos = 0;
+    majBarreRepos();
+}
+
+// Son de fin de repos : la vibration web n'existe pas sur iPhone.
+function preparerAudio() {
+    try {
+        if (!contexteAudio && (window.AudioContext || window.webkitAudioContext)) {
+            contexteAudio = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (contexteAudio && contexteAudio.state === "suspended") {
+            contexteAudio.resume();
+        }
+    } catch (erreur) {
+        contexteAudio = null;
+    }
+}
+
+function bip() {
+    if (!contexteAudio) {
+        return;
+    }
+    try {
+        for (let i = 0; i < 2; i++) {
+            const oscillateur = contexteAudio.createOscillator();
+            const volume = contexteAudio.createGain();
+            oscillateur.frequency.value = 880;
+            volume.gain.value = 0.15;
+            oscillateur.connect(volume);
+            volume.connect(contexteAudio.destination);
+            const debut = contexteAudio.currentTime + i * 0.25;
+            oscillateur.start(debut);
+            oscillateur.stop(debut + 0.15);
+        }
+    } catch (erreur) {
     }
 }
 
@@ -1814,7 +2066,7 @@ function terminerSeance() {
     }
 
     if (series.length === 0) {
-        alert("Valide au moins une série avec ✓ avant de terminer.");
+        informer("Valide au moins une série avec ✓ avant de terminer.");
         return;
     }
 
@@ -1835,6 +2087,7 @@ function terminerSeance() {
     finRepos = 0;
     relacherEcran();
     sauverSeance();
+    majBarreRepos();
     save();
     render();
     changerPage("muscu");
@@ -1901,7 +2154,12 @@ document.addEventListener("visibilitychange", function() {
 function renderSeances() {
     const liste = document.getElementById("seances-historique");
     liste.innerHTML = "";
+    let affichees = 0;
     for (let i = etat.seances.length - 1; i >= 0; i--) {
+        if (!historiqueComplet && affichees >= 5) {
+            break;
+        }
+        affichees++;
         const s = etat.seances[i];
         const li = document.createElement("li");
         li.className = "seance-histo";
@@ -1917,6 +2175,9 @@ function renderSeances() {
         li.appendChild(refaire);
         liste.appendChild(li);
     }
+    const voirTout = document.getElementById("btn-histo-voir-tout");
+    voirTout.hidden = etat.seances.length <= 5;
+    voirTout.textContent = historiqueComplet ? "Voir moins" : "Voir tout (" + etat.seances.length + ")";
 }
 
 function toggleVue() {
@@ -2134,21 +2395,24 @@ function afficherResultats(produits) {
 }
 
 function ajouterRepas(nom, kcal100, prot100, gluc100, lip100) {
-    const grammes = parseFloat(prompt("Combien de grammes ?", "100"));
-    if (!grammes) { return; }
-    const facteur = grammes / 100;
-    etat.nutrition.repas.push({
-        nom: nom,
-        kcal: kcal100 * facteur,
-        prot: prot100 * facteur,
-        gluc: gluc100 * facteur,
-        lip: lip100 * facteur,
-        date: todayStr()
+    demanderNombre("Combien de grammes de " + nom + " ?", 100).then(function(grammes) {
+        if (!(grammes > 0)) {
+            return;
+        }
+        const facteur = grammes / 100;
+        etat.nutrition.repas.push({
+            nom: nom,
+            kcal: kcal100 * facteur,
+            prot: prot100 * facteur,
+            gluc: gluc100 * facteur,
+            lip: lip100 * facteur,
+            date: todayStr()
+        });
+        document.getElementById("nutri-resultats").innerHTML = "";
+        document.getElementById("nutri-input").value = "";
+        render();
+        save();
     });
-    document.getElementById("nutri-resultats").innerHTML = "";
-    document.getElementById("nutri-input").value = "";
-    render();
-    save();
 }
 
 if (seanceEnCours) {

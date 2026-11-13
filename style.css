@@ -1632,3 +1632,116 @@ ul#seance-liste {
 .creer-exo-actions { display: flex; gap: 0.5rem; align-items: center; }
 .creer-exo-actions .btn-primaire { flex: 1; }
 #btn-creer-exo { align-self: flex-start; }
+
+/* ===========================================================
+   CORRECTIFS DE L'AUDIT (13/11/2026)
+   =========================================================== */
+
+/* L'attribut hidden doit toujours gagner, meme contre un display:flex d'id */
+[hidden] { display: none !important; }
+
+/* ---------- Cibles tactiles : 48 px minimum pendant la seance ---------- */
+#seance-liste .serie-ligne,
+#seance-liste + .serie-entete,
+.serie-entete {
+    grid-template-columns: 2.75rem 3.25rem 1fr 1fr 3rem;
+}
+#seance-liste .serie-ligne { padding: 4px var(--espace-sm); }
+#seance-liste .serie-ligne input { height: 3rem; font-size: 1.25rem; }
+#seance-liste .serie-valider { width: 3rem; height: 3rem; font-size: 1.3rem; }
+#seance-liste .serie-num { min-height: 3rem; min-width: 2.75rem; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
+#seance-liste .btn-ajouter-serie { min-height: 3rem; font-size: 0.95rem; }
+.seance-exo-tete .btn-suppr { min-height: 2.75rem; min-width: 2.75rem; }
+.repos-exo { padding: 0.2rem; }
+.repos-exo button { width: 2.75rem; height: 2.75rem; font-size: 1.3rem; }
+.repos-exo span { min-width: 4rem; font-size: 0.9rem; }
+.seance-exo-aide button { min-height: 2.75rem; padding: 0 0.9rem; }
+#btn-sortir-seance { min-height: 2.75rem; }
+#seance-liste .seance-exo-aide { font-size: 0.85rem; }
+
+/* ---------- Pendant la seance : plus de bulle, plus d'en-tete ---------- */
+body.en-seance #nav-onglets,
+body.en-seance #app-header { display: none !important; }
+body.en-seance #page-seance { padding-bottom: 9rem; }
+
+/* ---------- Minuteur de repos : barre fixe en bas, gros chiffres ---------- */
+#barre-repos {
+    position: fixed;
+    left: 0.75rem;
+    right: 0.75rem;
+    bottom: 0.75rem;
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    overflow: hidden;
+    background: var(--surface-2);
+    border: 1px solid var(--bordure);
+    border-radius: var(--rayon, 16px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+#barre-repos-fill {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 4px;
+    width: 100%;
+    background: var(--kaki-clair);
+    transition: width 0.9s linear;
+}
+#barre-repos-temps {
+    font-family: var(--police-chiffres, inherit);
+    font-variant-numeric: tabular-nums;
+    font-size: 2.4rem;
+    line-height: 1;
+    color: var(--kaki-clair);
+}
+.barre-repos-boutons { display: flex; gap: 0.4rem; }
+.barre-repos-boutons button { min-height: 3rem; min-width: 3.4rem; padding: 0 0.7rem; font-size: 0.95rem; }
+
+/* ---------- Dialogue maison (remplace alert / confirm / prompt) ---------- */
+#dialogue {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    background: rgba(0, 0, 0, 0.65);
+}
+#dialogue-boite {
+    width: 100%;
+    max-width: 22rem;
+    padding: 1.25rem;
+    background: var(--surface);
+    border: 1px solid var(--bordure);
+    border-radius: var(--rayon, 16px);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+}
+#dialogue-message { margin: 0 0 1rem; font-size: 1.05rem; line-height: 1.4; color: var(--texte); }
+#dialogue-champ {
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 1rem;
+    padding: 0.8rem;
+    font-size: 1.4rem;
+    text-align: center;
+    color: var(--texte);
+    background: var(--surface-2);
+    border: 1px solid var(--bordure);
+    border-radius: 12px;
+}
+#dialogue-actions { display: flex; gap: 0.5rem; justify-content: flex-end; }
+#dialogue-actions button { min-height: 3rem; min-width: 6rem; }
+
+/* ---------- Carte poids (premier lancement) ---------- */
+.poids-saisie { display: flex; gap: 0.5rem; align-items: center; }
+.poids-saisie input { width: 6rem; padding: 0.7rem; font-size: 1.1rem; text-align: center; color: var(--texte); background: var(--surface-2); border: 1px solid var(--bordure); border-radius: 12px; }
+.poids-saisie button { min-height: 3rem; }
+
+/* ---------- Page Muscu : la silhouette ne mange plus tout l'ecran ---------- */
+.stage-muscle svg { max-height: 23rem; width: auto; display: block; margin: 0 auto; }
+#btn-histo-voir-tout { margin: 0.25rem 0 1rem; }
