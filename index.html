@@ -5,7 +5,6 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
         <title>Ascension</title>
         <link rel="stylesheet" href="style.css">
-        <link rel="stylesheet" href="theme-notion.css">
         <link rel="manifest" href="manifest.json">
         <meta name="theme-color" content="#8C8B5E">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
@@ -21,7 +20,6 @@
             <header id="app-header">
                 <span id="app-nom">Ascension</span>
                 <div id="header-actions">
-                <button id="btn-toggle-vue" class="btn-tertiaire">Vue simple</button>
                 <button id="btn-header-profil" class="btn-tertiaire" aria-label="Profil"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0 1 16 0v1"/></svg></button>
                 </div>
             </header>
@@ -34,13 +32,6 @@
 
         <div id="page-accueil" class="page actif">
             <p id="message-coach"></p>
-            <div id="carte-poids" class="prochaine-seance" hidden>
-                <span class="prochaine-texte">Quel est ton poids ? Il sert à calculer ton objectif d'eau.</span>
-                <div class="poids-saisie">
-                    <input id="input-poids-accueil" type="text" inputmode="decimal" placeholder="kg" autocomplete="off">
-                    <button id="btn-poids-ok" class="btn-primaire">OK</button>
-                </div>
-            </div>
             <div id="prochaine-seance-accueil" class="prochaine-seance"></div>
 
             <div id="hero">
@@ -62,6 +53,17 @@
                 <p id="quete-timer"></p>
                 <p id="streak-alerte"></p>
                 <ul id="quete-objectifs"></ul>
+            </div>
+
+            <div id="hydratation">
+                <h3>Hydratation</h3>
+                <p id="hydra-texte"></p>
+                <div class="quete-barre">
+                    <div id="hydra-fill" class="quete-fill"></div>
+                </div>
+                <button id="btn-hydra">+300 ml</button>
+                <ul id="hydra-historique"></ul>
+                <p id="rappel-hydra"></p>
             </div>
         </div>
 
@@ -99,9 +101,15 @@
 <ul id="seances-historique"></ul>
 <button id="btn-histo-voir-tout" class="btn-tertiaire" hidden></button>
 
+<h3>Progression</h3>
+<select id="prog-exo" aria-label="Exercice à suivre" hidden></select>
+<div id="prog-graphique"></div>
+<p id="prog-texte" class="aide-texte"></p>
+
 <h3>Carte des muscles</h3>
 <div class="modes-carte">
     <button data-mode="volume" class="mode-carte on">Volume</button>
+    <button data-mode="force" class="mode-carte">Force</button>
     <button data-mode="recup" class="mode-carte">Récupération</button>
     <button data-mode="delaisse" class="mode-carte">Délaissés</button>
 </div>
@@ -233,16 +241,6 @@
             <h3>Repas d'aujourd'hui</h3>
             <ul id="nutri-repas"></ul>
 
-            <div id="hydratation">
-                <h3>Hydratation</h3>
-                <p id="hydra-texte"></p>
-                <div class="quete-barre">
-                    <div id="hydra-fill" class="quete-fill"></div>
-                </div>
-                <button id="btn-hydra">+300 ml</button>
-                <ul id="hydra-historique"></ul>
-                <p id="rappel-hydra"></p>
-            </div>
 
         </div>
 
@@ -265,6 +263,10 @@
                     </div>
                     <p id="fiche-classe"></p>
                     <p id="fiche-titre"></p>
+
+                    <h3>Programme</h3>
+                    <p id="profil-programme" class="aide-texte"></p>
+                    <button id="btn-onboarding" class="btn-secondaire">Modifier mon programme</button>
 
                     <h3>Données</h3>
                     <p class="aide-texte">Télécharge une copie de toutes tes données (séances, XP, badges). À faire de temps en temps : ton historique ne vit que sur cet appareil.</p>
@@ -317,6 +319,57 @@
                 </div>
             </form>
             <ul id="selecteur-liste"></ul>
+        </div>
+
+        <div id="onboarding" hidden>
+            <div id="onboarding-boite">
+                <div id="onb-etape-1">
+                    <h2>Bienvenue sur Ascension</h2>
+                    <p class="aide-texte">Trois questions pour régler l'app sur toi.</p>
+                    <label class="onb-label" for="onb-poids">Ton poids (kg)</label>
+                    <input id="onb-poids" type="text" inputmode="decimal" placeholder="ex. 80" autocomplete="off">
+                    <p class="onb-label">Ton objectif</p>
+                    <div class="onb-objectifs">
+                        <button class="filtre-puce onb-objectif" data-objectif="force">Force (4-6 reps)</button>
+                        <button class="filtre-puce onb-objectif" data-objectif="masse">Masse (8-12 reps)</button>
+                        <button class="filtre-puce onb-objectif" data-objectif="forme">Forme (12-15 reps)</button>
+                    </div>
+                    <div class="onb-actions">
+                        <button id="onb-passer" class="btn-tertiaire">Passer</button>
+                        <button id="onb-suivant-1" class="btn-primaire">Suivant</button>
+                    </div>
+                </div>
+                <div id="onb-etape-2" hidden>
+                    <h2>Tes jours d'entraînement</h2>
+                    <p class="aide-texte">Choisis les jours où tu vas à la salle.</p>
+                    <div id="onb-jours"></div>
+                    <p id="onb-jours-info" class="aide-texte"></p>
+                    <div class="onb-actions">
+                        <button id="onb-retour-2" class="btn-tertiaire">Retour</button>
+                        <button id="onb-suivant-2" class="btn-primaire">Suivant</button>
+                    </div>
+                </div>
+                <div id="onb-etape-3" hidden>
+                    <h2>Ton programme</h2>
+                    <p class="aide-texte">Voici ce que je te propose. Tu pourras le changer dans le Profil.</p>
+                    <ul id="onb-programme"></ul>
+                    <div class="onb-actions">
+                        <button id="onb-retour-3" class="btn-tertiaire">Retour</button>
+                        <button id="onb-terminer" class="btn-primaire">Commencer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="resume-seance" hidden>
+            <div id="resume-boite">
+                <canvas id="resume-canvas" width="1080" height="1350"></canvas>
+                <div class="resume-actions">
+                    <button id="resume-partager" class="btn-primaire">Partager</button>
+                    <button id="resume-telecharger" class="btn-secondaire">Télécharger</button>
+                    <button id="resume-fermer" class="btn-tertiaire">Fermer</button>
+                </div>
+            </div>
         </div>
 
         <div id="dialogue" hidden>

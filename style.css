@@ -57,7 +57,7 @@
     --verre-flou: blur(18px) saturate(140%);
 }
 
-body{
+body {
     background-color: var(--bg);
     color: var(--texte);
     font-family: var(--police-texte);
@@ -67,7 +67,7 @@ body{
     margin: 0;
     padding: 68px var(--espace-lg) calc(104px + env(safe-area-inset-bottom));
 }
-body::before{
+body::before {
     content: "";
     position: fixed;
     inset: 0;
@@ -78,7 +78,7 @@ body::before{
         radial-gradient(55% 40% at 88% 12%, rgba(242, 199, 68, 0.10), transparent 70%);
 }
 
-button{
+button {
     background-color: #8C8B5E;
     color: #101109;
     border: none;
@@ -89,30 +89,30 @@ button{
     cursor: pointer;
 }
 
-#level-badge{
+#level-badge {
     font-size: 28px;
     font-weight: bold;
     display: block;
     margin-bottom: 10px;
 }
 
-#lock-screen{
+#lock-screen {
     text-align: center;
     padding-top: 15vh;
 }
 
-#quote{
+#quote {
     font-style: italic;
     color: #A6A594;
     margin-bottom: 20px;
 }
 
-h1{
+h1 {
     font-size: 22px;
     margin-bottom: 30px;
 }
 
-#xp-bar{
+#xp-bar {
     width: 200px;
     height: 12px;
     background-color: #2C2D22;
@@ -121,7 +121,7 @@ h1{
     margin-bottom: 10px;
 }
 
-#xp-fill{
+#xp-fill {
     height: 100%;
     background-color: #8C8B5E;
     width: 0%;
@@ -131,7 +131,8 @@ h1{
     max-width: 180px;
     margin: 0 auto;
 }
-#avatar svg, #avatar img {
+#avatar svg,
+#avatar img {
     width: 100%;
     display: block;
 }
@@ -148,28 +149,28 @@ h1{
     background: rgba(242, 199, 68, 0.10);
 }
 
-.stage-muscle{
+.stage-muscle {
     width: min(300px, 80vw);
 }
 
-.stage-muscle svg{
+.stage-muscle svg {
     width: 100%;
     height: auto;
 }
 
-.view{
+.view {
     display: none;
 }
 
-.view.on{
+.view.on {
     display: block;
 }
 
-.neutral{
+.neutral {
     fill: #2C2D22;
 }
 
-.muscle{
+.muscle {
     fill: #3A3B2E;
     stroke: #5A5B45;
     stroke-width: 0.8;
@@ -177,7 +178,7 @@ h1{
     transition: fill 0.2s ease;
 }
 
-.sep{
+.sep {
     fill: none;
     stroke: #5A5B45;
     stroke-width: 0.8;
@@ -194,16 +195,16 @@ h1{
     z-index: 10;
 }
 
-#quete-objectifs{
+#quete-objectifs {
     list-style: none;
     padding: 0;
 }
 
-#quete-objectifs li{
+#quete-objectifs li {
     margin-bottom: 14px;
 }
 
-.quete-barre{
+.quete-barre {
     background-color: #2C2D22;
     border-radius: 6px;
     height: 10px;
@@ -211,24 +212,20 @@ h1{
     margin: 6px 0;
 }
 
-.quete-fill{
+.quete-fill {
     background-color: var(--kaki-clair);
     height: 100%;
     width: 0%;
 }
 
-.quete-plus{
-    padding: 4px 12px;
-    font-size: 13px;
-    transition: transform 0.1s, background-color 0.1s;
-}
-#dashboard-compteurs{
+
+#dashboard-compteurs {
     display: flex;
     gap: 12px;
     margin: 16px 0;
 }
 
-.compteur{
+.compteur {
     background-color: #1B1C13;
     border-radius: 10px;
     padding: 10px 14px;
@@ -236,31 +233,21 @@ h1{
     flex: 1;
 }
 
-.compteur-valeur{
+.compteur-valeur {
     display: block;
     font-size: 22px;
     font-weight: bold;
     color: #F2C744;
 }
 
-.compteur-label{
+.compteur-label {
     font-size: 12px;
     color: #A6A594;
 }
 
-#mob-graphique{
-    display: flex;
-    align-items: flex-end;
-    gap: 6px;
-    height: 120px;
-    margin: 16px 0;
-}
 
-.mob-barre{
-    width: 24px;
-    background-color: #8C8B5E;
-    border-radius: 4px 4px 0 0;
-}
+
+
 .btn-primaire {
     background-color: var(--kaki);
     color: var(--bg);
@@ -328,12 +315,9 @@ h1{
     font-size: 20px;
 }
 
-.quete-plus:active{
-    transform: scale(0.95);
-    background-color: var(--kaki-fonce);
-}
 
-#quete-timer{
+
+#quete-timer {
     display: inline-block;
     background-color: var(--surface-2);
     color: var(--accent);
@@ -343,12 +327,12 @@ h1{
     font-variant-numeric: tabular-nums;
 }
 
-#hydra-historique{
+#hydra-historique {
     list-style: none;
     padding: 0;
 }
 
-#hydra-historique li{
+#hydra-historique li {
     display: flex;
     justify-content: space-between;
     max-width: 220px;
@@ -356,7 +340,7 @@ h1{
     border-bottom: 1px solid var(--surface-2);
 }
 
-.vue-muscle{
+.vue-muscle {
     background-color: var(--surface-2);
     color: var(--texte-dim);
     border: none;
@@ -366,12 +350,12 @@ h1{
     cursor: pointer;
 }
 
-.vue-muscle.on{
+.vue-muscle.on {
     background-color: var(--kaki);
     color: var(--bg);
 }
 
-#legende-muscles{
+#legende-muscles {
     display: flex;
     flex-wrap: wrap;
     gap: var(--espace-md);
@@ -380,7 +364,7 @@ h1{
     font-size: var(--texte-label);
 }
 
-#legende-muscles i{
+#legende-muscles i {
     display: inline-block;
     width: 11px;
     height: 11px;
@@ -388,7 +372,7 @@ h1{
     margin-right: 4px;
 }
 
-.seance-date{
+.seance-date {
     list-style: none;
     font-weight: bold;
     color: var(--accent);
@@ -396,7 +380,7 @@ h1{
     font-size: var(--texte-label);
 }
 
-.btn-suppr{
+.btn-suppr {
     background-color: transparent;
     color: var(--erreur);
     border: none;
@@ -432,43 +416,21 @@ h1{
     margin-top: 0;
 }
 
-#btn-start-course[hidden]{
+#btn-start-course[hidden] {
     display: none;
 }
 
-.test-mobilite{
-    margin-bottom: var(--espace-md);
-}
 
-.selecteur {
-    display: flex;
-    gap: var(--espace-sm);
-    margin-top: var(--espace-sm);
-}
 
-.btn-note {
-    width: 40px;
-    min-height: 40px;
-    border-radius: 8px;
-    background-color: var(--surface-2);
-    color: var(--texte);
-    border: none;
-    cursor: pointer;
-}
 
-.btn-note.actif{
-    background-color: var(--kaki);
-    color: var(--bg);
-}
 
-.mob-barre{
-    color: var(--bg);
-    font-size: 10px;
-    text-align: center;
-    font-weight: bold;
-}
 
-#celebration{
+
+
+
+
+
+#celebration {
     position: fixed;
     top: 0;
     left: 0;
@@ -481,10 +443,10 @@ h1{
     z-index: 200;
 }
 
-#celebration[hidden]{
+#celebration[hidden] {
     display: none;
 }
-#celebration-contenu{
+#celebration-contenu {
     background-color: var(--surface);
     padding: var(--espace-2xl);
     border: 2px solid var(--accent);
@@ -493,7 +455,7 @@ h1{
     animation: pop 0.3s ease;
 }
 
-#celebration-message{
+#celebration-message {
     font-size: var(--texte-hero);
     font-weight: bold;
     color: var(--accent);
@@ -510,19 +472,14 @@ h1{
     }
 }
 
-#streak-alerte{
+#streak-alerte {
     color: var(--erreur);
     font-weight: bold;
 }
 
-.btn-note{
-    min-width: 44px;
-    min-height: 44px;
-}
 
-.quete-plus{
-    min-height: 44px;
-}
+
+
 
 .btn-suppr {
     min-width: 44px;
@@ -555,16 +512,20 @@ h1{
     background: linear-gradient(160deg, #1F2016, var(--surface));
 }
 
-.quete-fill, #hydra-fill, #xp-fill {
+.quete-fill,
+#hydra-fill,
+#xp-fill {
     transition: width 0.3s ease-out;
 }
 .onglet {
     transition: color 0.2s ease;
 }
-.btn-primaire, .btn-secondaire {
+.btn-primaire,
+.btn-secondaire {
     transition: transform 0.1s ease, filter 0.15s ease;
 }
-.btn-primaire:active, .btn-secondaire:active {
+.btn-primaire:active,
+.btn-secondaire:active {
     transform: scale(0.97);
 }
 
@@ -573,7 +534,8 @@ h1{
     font-weight: 800;
     letter-spacing: 0.5px;
 }
-#rang-score, #avatar-next {
+#rang-score,
+#avatar-next {
     font-size: var(--texte-label);
     color: var(--texte-dim);
 }
@@ -585,10 +547,12 @@ h1{
     margin-top: var(--espace-sm);
     margin-bottom: var(--espace-xl);
 }
-#quete-du-jour, #hydratation {
+#quete-du-jour,
+#hydratation {
     margin-top: var(--espace-2xl);
 }
-#quete-du-jour h3, #hydratation h3 {
+#quete-du-jour h3,
+#hydratation h3 {
     margin-bottom: var(--espace-md);
 }
 
@@ -619,11 +583,7 @@ h1{
     font-style: italic;
 }
 
-.mode-liste #hero,
-.mode-liste #streak-semaine,
-.mode-liste #message-coach {
-    display: none;
-}
+
 
 #rappel-hydra {
     color: var(--accent);
@@ -692,13 +652,14 @@ h1{
 #app-nom,
 #level-badge,
 #celebration-message,
-h1, h2, h3,
+h1,
+h2,
+h3,
 .compteur-valeur,
 #seance-duree,
 #seance-volume,
 #seance-series,
 #quete-timer,
-#mob-score,
 #nutri-calories,
 #hydra-texte,
 .course-stats p,
@@ -706,7 +667,9 @@ h1, h2, h3,
     font-family: var(--police-titre);
 }
 
-h1, h2, h3 {
+h1,
+h2,
+h3 {
     letter-spacing: 0.01em;
     line-height: 1.2;
 }
@@ -845,7 +808,6 @@ h3 {
 ul#liste-exercice,
 ul#seances-historique,
 ul#liste-courses,
-ul#mob-historique,
 ul#liste-badges,
 ul#nutri-repas,
 ul#nutri-resultats,
@@ -858,7 +820,6 @@ ul#seance-liste {
 #liste-exercice li,
 #seances-historique li,
 #liste-courses li,
-#mob-historique li,
 #liste-badges li,
 #nutri-repas li,
 #nutri-resultats li,
@@ -1002,11 +963,7 @@ ul#seance-liste {
 }
 
 /* Le bouton principal de l'accueil */
-#page-accueil #btn-full-session {
-    display: block;
-    width: 100%;
-    margin-bottom: var(--espace-lg);
-}
+
 
 /* ===========================================================
    Carte de streak : 7 pastilles L M M J V S D
@@ -1293,7 +1250,9 @@ ul#seance-liste {
 /* ---------- Champs de saisie : un seul style partout ----------
    :where() = specificite zero, donc les champs specifiques
    (.serie-ligne input, #selecteur-recherche) gardent la main. */
-:where(input[type="text"], input[type="number"], select) {
+:where(input[type="text"],
+input[type="number"],
+select) {
     box-sizing: border-box;
     padding: var(--espace-md);
     border-radius: 10px;
@@ -1304,7 +1263,9 @@ ul#seance-liste {
     font-size: var(--texte-corps);
 }
 
-:where(input[type="text"], input[type="number"], select):focus {
+:where(input[type="text"],
+input[type="number"],
+select):focus {
     outline: none;
     border-color: var(--kaki);
     box-shadow: 0 0 0 3px rgba(140, 139, 94, 0.18);
@@ -1414,30 +1375,18 @@ ul#seance-liste {
 }
 
 /* ---------- Mobilite ---------- */
-.test-mobilite {
-    padding: var(--espace-md);
-    border-radius: var(--rayon);
-    background: var(--surface);
-    border: 1px solid rgba(180, 179, 137, 0.10);
-}
 
-.test-mobilite .selecteur {
-    justify-content: space-between;
-}
 
-.test-mobilite .btn-note {
-    flex: 1;
-}
+
+
+
 
 #btn-echauffement,
 #btn-etirement {
     margin: 0 var(--espace-sm) var(--espace-md) 0;
 }
 
-#mob-score {
-    font-size: var(--texte-h2);
-    color: var(--accent);
-}
+
 
 /* ---------- Profil ---------- */
 #fiche-perso label {
@@ -1475,12 +1424,7 @@ ul#seance-liste {
     color: var(--texte-dim);
 }
 
-#seance-repos {
-    font-family: var(--police-titre);
-    font-size: var(--texte-h2);
-    font-variant-numeric: tabular-nums;
-    color: var(--succes);
-}
+
 
 /* Le repos et le bouton de duree passent sur leur propre ligne.
    min-height : la place est reservee, l'en-tete ne saute pas quand le repos demarre. */
@@ -1489,21 +1433,9 @@ ul#seance-liste {
     row-gap: var(--espace-sm);
 }
 
-#seance-repos {
-    order: 2;
-    flex-basis: 100%;
-    min-height: 1.5em;
-    text-align: center;
-}
 
-#btn-duree-repos {
-    order: 3;
-    min-height: 0;
-    padding: var(--espace-xs) var(--espace-md);
-    font-size: var(--texte-label);
-    border: 1px solid var(--bordure);
-    border-radius: 999px;
-}
+
+
 
 /* Titre de l'exercice + croix pour le retirer */
 .seance-exo-tete {
@@ -1610,7 +1542,7 @@ ul#seance-liste {
 .prochaine-autres { display: flex; flex-wrap: wrap; gap: 0.4rem; width: 100%; }
 .seance-exo-aide { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin: 0 0 0.5rem; padding: 0.5rem 0.75rem; font-size: 0.8rem; color: var(--texte-dim, #A9A58F); background: var(--surface-2); border-radius: 12px; }
 .seance-exo-aide button { flex-shrink: 0; }
-.btn-repos-exo { margin-left: auto; margin-right: 0.5rem; padding: 0.25rem 0.7rem; border: none; border-radius: 999px; background: var(--surface-2); color: var(--texte-dim, #A9A58F); font-size: 0.8rem; cursor: pointer; }
+
 .modes-carte { display: flex; gap: 0.4rem; margin: 0.75rem 0 0.25rem; }
 .mode-carte { padding: 0.4rem 0.9rem; border: none; border-radius: 999px; background: var(--surface-2); color: var(--texte-dim, #A9A58F); font-size: 0.85rem; cursor: pointer; }
 .mode-carte.on { background: var(--kaki); color: var(--bg); }
@@ -1619,7 +1551,8 @@ ul#seance-liste {
 .seance-histo { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
 
 /* Messages d'alerte de l'accueil : ambre calme plutot que rouge */
-#streak-alerte, #quete-penalite { color: #D9A25A; }
+#streak-alerte,
+#quete-penalite { color: #D9A25A; }
 
 /* Repos par exercice : - / valeur / + de 15 s en 15 s */
 .repos-exo { display: flex; align-items: center; gap: 0.25rem; margin-left: auto; margin-right: 0.5rem; padding: 0.15rem; background: var(--surface-2); border-radius: 999px; font-size: 0.8rem; color: var(--texte-dim, #A9A58F); }
@@ -1628,7 +1561,8 @@ ul#seance-liste {
 
 /* Creation d'un exercice personnel */
 #form-creer-exo { display: flex; flex-direction: column; gap: 0.5rem; margin: 0.5rem 0 1rem; padding: 0.75rem; background: var(--surface); border-radius: var(--rayon, 16px); }
-#form-creer-exo input, #form-creer-exo select { width: 100%; box-sizing: border-box; padding: 0.7rem 0.8rem; border: 1px solid var(--verre-bordure, rgba(180,179,137,0.2)); border-radius: 12px; background: var(--surface-2); color: var(--texte); font-size: 1rem; font-family: inherit; }
+#form-creer-exo input,
+#form-creer-exo select { width: 100%; box-sizing: border-box; padding: 0.7rem 0.8rem; border: 1px solid var(--verre-bordure, rgba(180,179,137,0.2)); border-radius: 12px; background: var(--surface-2); color: var(--texte); font-size: 1rem; font-family: inherit; }
 .creer-exo-actions { display: flex; gap: 0.5rem; align-items: center; }
 .creer-exo-actions .btn-primaire { flex: 1; }
 #btn-creer-exo { align-self: flex-start; }
@@ -1738,10 +1672,479 @@ body.en-seance #page-seance { padding-bottom: 9rem; }
 #dialogue-actions button { min-height: 3rem; min-width: 6rem; }
 
 /* ---------- Carte poids (premier lancement) ---------- */
-.poids-saisie { display: flex; gap: 0.5rem; align-items: center; }
-.poids-saisie input { width: 6rem; padding: 0.7rem; font-size: 1.1rem; text-align: center; color: var(--texte); background: var(--surface-2); border: 1px solid var(--bordure); border-radius: 12px; }
-.poids-saisie button { min-height: 3rem; }
+
+
+
 
 /* ---------- Page Muscu : la silhouette ne mange plus tout l'ecran ---------- */
 .stage-muscle svg { max-height: 23rem; width: auto; display: block; margin: 0 auto; }
 #btn-histo-voir-tout { margin: 0.25rem 0 1rem; }
+
+/* ===========================================================
+   FONCTIONS DE SEANCE : echauffement, notes, ordre, superset,
+   technique, progression, premier lancement, resume
+   =========================================================== */
+
+/* Le ✓ est le plus gros element de la ligne */
+#seance-liste .serie-ligne,
+#seance-liste .serie-entete {
+    grid-template-columns: 2.75rem 3.25rem 1fr 1fr 3.5rem;
+}
+#seance-liste .serie-valider { width: 3.4rem; height: 3.4rem; font-size: 1.5rem; }
+
+.seance-exo-actions { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0 0 0.5rem; }
+.btn-action-exo {
+    min-height: 2.75rem;
+    min-width: 2.75rem;
+    padding: 0 0.8rem;
+    border: 1px solid var(--bordure);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--texte-dim, #A9A58F);
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+.btn-action-exo.actif { background: var(--kaki); border-color: var(--kaki); color: var(--bg); }
+.btn-action-exo:disabled { opacity: 0.35; cursor: default; }
+
+.seance-exo-consigne {
+    margin: 0 0 0.5rem;
+    padding: 0.6rem 0.8rem;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    color: var(--texte);
+    background: var(--surface-2);
+    border-left: 3px solid var(--kaki);
+    border-radius: 8px;
+}
+.seance-exo-note {
+    width: 100%;
+    box-sizing: border-box;
+    margin: 0 0 0.5rem;
+    padding: 0.6rem 0.8rem;
+    font-family: inherit;
+    font-size: 0.9rem;
+    color: var(--texte);
+    background: transparent;
+    border: 1px dashed var(--bordure);
+    border-radius: 12px;
+}
+.seance-exo-note:focus { outline: none; border-color: var(--kaki); }
+
+.serie-ligne.echauffement { background: transparent; border: 1px dashed var(--bordure); opacity: 0.85; }
+.serie-ligne.echauffement .serie-num { color: var(--kaki-clair); font-weight: 700; }
+
+.seance-exo.superset-debut,
+.seance-exo.superset-suite { border-left: 3px solid var(--kaki); padding-left: 0.6rem; }
+.superset-etiquette { margin: 0 0 0.5rem; font-size: 0.8rem; color: var(--kaki-clair); }
+
+.modes-carte { flex-wrap: wrap; }
+
+/* ---------- Progression ---------- */
+#prog-exo {
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 0.5rem;
+    padding: 0.7rem;
+    font-size: 1rem;
+    color: var(--texte);
+    background: var(--surface-2);
+    border: 1px solid var(--bordure);
+    border-radius: 12px;
+}
+.prog-svg { width: 100%; height: auto; display: block; }
+.prog-ligne { fill: none; stroke: var(--kaki-clair); stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
+.prog-point { fill: var(--accent); }
+.prog-label { fill: var(--texte-dim, #A9A58F); font-size: 11px; }
+
+/* ---------- Premier lancement ---------- */
+#onboarding {
+    position: fixed;
+    inset: 0;
+    z-index: 150;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.25rem;
+    overflow-y: auto;
+    background: var(--bg);
+}
+#onboarding-boite { width: 100%; max-width: 26rem; }
+#onboarding h2 { margin: 0 0 0.5rem; }
+.onb-label { display: block; margin: 1rem 0 0.4rem; font-size: 0.9rem; color: var(--texte-dim, #A9A58F); }
+#onb-poids {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.9rem;
+    font-size: 1.4rem;
+    text-align: center;
+    color: var(--texte);
+    background: var(--surface-2);
+    border: 1px solid var(--bordure);
+    border-radius: 12px;
+}
+.onb-objectifs, #onb-jours { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.onb-objectifs .filtre-puce, #onb-jours .filtre-puce { min-height: 3rem; padding: 0 1rem; font-size: 1rem; }
+.onb-actions { display: flex; gap: 0.5rem; justify-content: space-between; margin-top: 1.5rem; }
+.onb-actions button { min-height: 3rem; min-width: 7rem; }
+#onb-programme { list-style: none; padding: 0; margin: 1rem 0; }
+#onb-programme li { padding: 0.8rem 1rem; margin-bottom: 0.5rem; background: var(--surface); border-radius: 12px; }
+
+/* ---------- Resume de fin de seance ---------- */
+#resume-seance {
+    position: fixed;
+    inset: 0;
+    z-index: 180;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    overflow-y: auto;
+    background: rgba(0, 0, 0, 0.82);
+}
+#resume-boite { width: 100%; max-width: 22rem; display: flex; flex-direction: column; gap: 0.75rem; }
+#resume-canvas { width: 100%; height: auto; display: block; border-radius: 12px; }
+.resume-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.resume-actions button { flex: 1; min-height: 3rem; }
+
+/* ===========================================================
+   THEME BONSAI (ex theme-notion.css, fusionne dans style.css)
+   =========================================================== */
+/* ===========================================================
+   Theme "Bonsai" : calme, terreux, qui respire.
+   (Le fichier garde le nom theme-notion.css pour ne pas casser le <link>.)
+
+   Chargee APRES style.css. Pour revenir a l'ancien design :
+   supprimer la ligne <link> de ce fichier dans index.html.
+
+   Principes : un fond vert-noir chaud, des tons mousse et ecorce,
+   texte papier, coins genereux, aucun degrade ni lueur,
+   transitions lentes, titres en serif discret.
+   =========================================================== */
+
+:root {
+    /* Terre et mousse */
+    --bg: #12130E;
+    --surface: #1A1C14;
+    --surface-2: #252920;
+    --texte: #E7E3D3;
+    --texte-dim: #8F8D7A;
+    --bordure: rgba(231, 227, 211, 0.14);
+
+    --kaki: #8E9A62;
+    --kaki-fonce: #626D40;
+    --kaki-clair: #B9C48A;
+    --accent: #C8C58D;
+    --succes: #8FAE6B;
+    --erreur: #BF6F58;
+    --warning: #C99A55;
+
+    --rayon: 16px;
+    --ombre: none;
+    --verre-fond: rgba(26, 28, 20, 0.92);
+    --verre-bordure: rgba(231, 227, 211, 0.08);
+    --verre-flou: blur(10px);
+
+    /* Titres en serif discret, chiffres cles en Morhefa */
+    --police-titre: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    --police-chiffres: "Morhefa", system-ui, sans-serif;
+
+    --texte-h1: 26px;
+    --texte-h2: 20px;
+    --texte-label: 12px;
+}
+
+/* ---------- Fond : une seule teinte, tres douce ---------- */
+body::before {
+    background: radial-gradient(70% 40% at 50% 0%, rgba(142, 154, 98, 0.07), transparent 70%);
+}
+
+body {
+    line-height: 1.6;
+    padding-top: 72px;
+}
+
+/* ---------- Titres : serif, sans majuscules criardes ---------- */
+h1,
+h2,
+h3 {
+    letter-spacing: 0;
+    font-family: var(--police-titre);
+}
+
+h2 {
+    font-weight: 600;
+    font-size: var(--texte-h1);
+    margin-bottom: var(--espace-lg);
+}
+
+h3 {
+    text-transform: none;
+    letter-spacing: 0.01em;
+    font-size: 15px;
+    font-weight: 500;
+    font-style: italic;
+    color: var(--texte-dim);
+    margin-top: var(--espace-2xl);
+}
+
+/* ---------- Morhefa : uniquement les chiffres cles et le rang ---------- */
+#app-nom,
+#level-badge,
+.compteur-valeur,
+.anneau-pct,
+#seance-duree,
+#celebration-message {
+    font-family: var(--police-chiffres);
+}
+
+/* ---------- En-tete ---------- */
+#app-header {
+    background: rgba(18, 19, 14, 0.9);
+    border-bottom: 1px solid var(--verre-bordure);
+}
+
+#app-nom {
+    letter-spacing: 0.06em;
+    color: var(--kaki-clair);
+}
+
+/* ---------- Bulle de navigation : conservee, adoucie ---------- */
+#nav-onglets {
+    background: var(--verre-fond);
+    border: 1px solid var(--verre-bordure);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+}
+
+.onglet {
+    transition: color 0.4s ease, background 0.4s ease;
+}
+
+.onglet.actif {
+    color: var(--kaki-clair);
+    background: rgba(142, 154, 98, 0.16);
+}
+
+/* ---------- Cartes : aplat, coins genereux, trait fin ---------- */
+#hero,
+#streak-semaine,
+#quete-du-jour,
+#hydratation,
+.nutri-resume,
+.compteur,
+.course-stats,
+.anneau,
+#seance-entete,
+#detail-muscle,
+#celebration-contenu {
+    background: var(--surface);
+    border: 1px solid var(--verre-bordure);
+    border-radius: var(--rayon);
+    box-shadow: none;
+}
+
+#celebration-contenu {
+    border-color: var(--kaki);
+}
+
+/* ---------- Boutons : doux et ronds ---------- */
+.btn-primaire {
+    background: var(--kaki);
+    color: #12130E;
+    border-radius: 999px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+}
+
+.btn-secondaire {
+    background: transparent;
+    border: 1px solid var(--bordure);
+    color: var(--kaki-clair);
+    border-radius: 999px;
+    font-weight: 500;
+}
+
+.btn-tertiaire {
+    color: var(--texte-dim);
+}
+
+#btn-abandonner-seance {
+    color: var(--erreur);
+}
+
+.vue-muscle,
+.filtre-puce {
+    border-radius: 999px;
+}
+
+.vue-muscle.on,
+.filtre-puce.actif {
+    background: rgba(142, 154, 98, 0.22);
+    color: var(--kaki-clair);
+}
+
+/* ---------- Champs ---------- */
+:where(input[type="text"],
+input[type="number"],
+select),
+#selecteur-recherche {
+    background: var(--surface);
+    border: 1px solid var(--verre-bordure);
+    border-radius: 12px;
+}
+
+:where(input[type="text"],
+input[type="number"],
+select):focus,
+#selecteur-recherche:focus {
+    border-color: var(--kaki);
+    box-shadow: 0 0 0 3px rgba(142, 154, 98, 0.16);
+}
+
+#selecteur-exercice {
+    background: rgba(18, 19, 14, 0.97);
+}
+
+/* ---------- Barres, anneaux, pastilles : mousse, sans lueur ---------- */
+.module-barre,
+.quete-barre,
+#xp-bar,
+#hero #xp-bar {
+    height: 6px;
+    border-radius: 999px;
+    background-color: var(--surface-2);
+}
+
+.module-fill,
+.quete-fill,
+#hydra-fill,
+#xp-fill,
+#hero #xp-fill {
+    border-radius: 999px;
+    box-shadow: none;
+    background: var(--kaki) !important;
+    transition: width 0.6s ease;
+}
+
+.anneau-jauge {
+    filter: none;
+    stroke: var(--kaki);
+}
+
+.anneau-fond {
+    stroke: var(--surface-2);
+}
+
+.streak-point.rempli {
+    background: var(--kaki);
+    box-shadow: none;
+}
+
+.streak-jour.aujourdhui .streak-point {
+    border-color: var(--kaki-clair);
+}
+
+.streak-jour.aujourdhui .streak-lettre {
+    color: var(--kaki-clair);
+}
+
+#message-coach {
+    font-family: var(--police-titre);
+    font-style: italic;
+    border-left: 2px solid var(--kaki-fonce);
+    color: var(--kaki-clair);
+}
+
+/* ---------- Listes : separees par un trait fin ---------- */
+#liste-exercice li,
+#seances-historique li,
+#liste-courses li,
+#liste-badges li,
+#nutri-repas li,
+#nutri-resultats li,
+#routine-liste li,
+.exo-ligne {
+    border-bottom: 1px solid var(--verre-bordure);
+}
+
+.exo-ligne:active,
+#nutri-resultats li:active {
+    background: rgba(142, 154, 98, 0.10);
+}
+
+.selecteur-section {
+    text-transform: none;
+    letter-spacing: 0.01em;
+    font-family: var(--police-titre);
+    font-style: italic;
+    font-size: 14px;
+}
+
+/* ---------- Seance : tableau de series ---------- */
+#seance-entete {
+    padding: var(--espace-lg);
+}
+
+#seance-duree {
+    color: var(--kaki-clair);
+}
+
+.seance-exo-nom {
+    font-family: var(--police-titre);
+    font-weight: 600;
+    font-size: 18px;
+    color: var(--texte);
+}
+
+.serie-ligne {
+    background: transparent;
+    border-radius: 12px;
+}
+
+.serie-ligne > span:first-child,
+.serie-num {
+    font-family: var(--police-titre);
+}
+
+.serie-ligne input {
+    background: var(--surface-2);
+    border: none;
+    border-radius: 10px;
+    font-family: var(--police-chiffres);
+}
+
+.serie-ligne input:focus {
+    box-shadow: 0 0 0 2px rgba(142, 154, 98, 0.45);
+}
+
+.serie-valider {
+    border-radius: 50%;
+    border: 1.5px solid var(--bordure);
+    transition: background 0.4s ease, border-color 0.4s ease;
+}
+
+.serie-ligne {
+    transition: background 0.4s ease;
+}
+
+.serie-ligne.fait {
+    background: rgba(142, 154, 98, 0.14);
+}
+
+.serie-ligne.fait .serie-valider {
+    background: var(--kaki);
+    border-color: var(--kaki);
+}
+
+#seance-liste .btn-ajouter-serie {
+    border: 1px dashed var(--bordure);
+    border-radius: 12px;
+    color: var(--texte-dim);
+}
+
+
+
+
+
+/* Graphique de progression : largeur plafonnee sur grand ecran */
+#prog-graphique { max-width: 26rem; margin: 0 auto; }
