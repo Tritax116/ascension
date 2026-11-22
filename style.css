@@ -18,19 +18,19 @@
 }
 
 :root {
-    --bg: #070706;
-    --surface: #1B1C13;
-    --surface-2: #2C2D22;
-    --kaki: #8C8B5E;
-    --kaki-fonce: #6E6D48;
-    --kaki-clair: #B4B389;
-    --accent: #F2C744;
-    --texte: #F2F1E8;
-    --texte-dim: #A6A594;
-    --bordure: #5A5B45;
-    --succes: #6FA86F;
-    --erreur: #C1614F;
-    --warning: #E0A244;
+    --bg: #12130E;
+    --surface: #1A1C14;
+    --surface-2: #252920;
+    --kaki: #8E9A62;
+    --kaki-fonce: #626D40;
+    --kaki-clair: #B9C48A;
+    --accent: #C8C58D;
+    --texte: #E7E3D3;
+    --texte-dim: #8F8D7A;
+    --bordure: rgba(231, 227, 211, 0.14);
+    --succes: #8FAE6B;
+    --erreur: #BF6F58;
+    --warning: #C99A55;
     --espace-xs: 4px;
     --espace-sm: 8px;
     --espace-md: 12px;
@@ -38,23 +38,26 @@
     --espace-xl: 24px;
     --espace-2xl: 32px;
     --texte-hero: 28px;
-    --texte-h1: 22px;
-    --texte-h2: 18px;
+    --texte-h1: 26px;
+    --texte-h2: 20px;
     --texte-h3: 16px;
     --texte-corps: 15px;
     --texte-label: 12px;
-    --rayon: 14px;
-    --ombre: 0 4px 16px rgba(0, 0, 0, 0.45);
+    --rayon: 16px;
+    --ombre: none;
 
     /* Deux familles : Morhefa est une police d'affichage, illisible en petit.
        Elle habille les titres et les chiffres ; le texte courant passe en police systeme. */
-    --police-titre: "Morhefa", system-ui, sans-serif;
+    --police-titre: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
     --police-texte: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
 
     /* Verre : une seule definition, reutilisee partout */
-    --verre-fond: rgba(27, 28, 19, 0.72);
-    --verre-bordure: rgba(180, 179, 137, 0.18);
-    --verre-flou: blur(18px) saturate(140%);
+    --verre-fond: rgba(26, 28, 20, 0.92);
+    --verre-bordure: rgba(231, 227, 211, 0.08);
+    --verre-flou: blur(10px);
+
+    /* Ajoutes par le theme Bonsai */
+    --police-chiffres: "Morhefa", system-ui, sans-serif;
 }
 
 body {
@@ -246,8 +249,6 @@ h1 {
 }
 
 
-
-
 .btn-primaire {
     background-color: var(--kaki);
     color: var(--bg);
@@ -314,8 +315,6 @@ h1 {
 .onglet-icone {
     font-size: 20px;
 }
-
-
 
 #quete-timer {
     display: inline-block;
@@ -424,12 +423,6 @@ h1 {
 
 
 
-
-
-
-
-
-
 #celebration {
     position: fixed;
     top: 0;
@@ -476,8 +469,6 @@ h1 {
     color: var(--erreur);
     font-weight: bold;
 }
-
-
 
 
 
@@ -582,8 +573,6 @@ h1 {
     margin-bottom: var(--espace-md);
     font-style: italic;
 }
-
-
 
 #rappel-hydra {
     color: var(--accent);
@@ -1379,14 +1368,10 @@ select):focus {
 
 
 
-
-
 #btn-echauffement,
 #btn-etirement {
     margin: 0 var(--espace-sm) var(--espace-md) 0;
 }
-
-
 
 /* ---------- Profil ---------- */
 #fiche-perso label {
@@ -1424,16 +1409,12 @@ select):focus {
     color: var(--texte-dim);
 }
 
-
-
 /* Le repos et le bouton de duree passent sur leur propre ligne.
    min-height : la place est reservee, l'en-tete ne saute pas quand le repos demarre. */
 #seance-entete {
     flex-wrap: wrap;
     row-gap: var(--espace-sm);
 }
-
-
 
 
 
@@ -1674,8 +1655,6 @@ body.en-seance #page-seance { padding-bottom: 9rem; }
 /* ---------- Carte poids (premier lancement) ---------- */
 
 
-
-
 /* ---------- Page Muscu : la silhouette ne mange plus tout l'ecran ---------- */
 .stage-muscle svg { max-height: 23rem; width: auto; display: block; margin: 0 auto; }
 #btn-histo-voir-tout { margin: 0.25rem 0 1rem; }
@@ -1822,37 +1801,6 @@ body.en-seance #page-seance { padding-bottom: 9rem; }
    transitions lentes, titres en serif discret.
    =========================================================== */
 
-:root {
-    /* Terre et mousse */
-    --bg: #12130E;
-    --surface: #1A1C14;
-    --surface-2: #252920;
-    --texte: #E7E3D3;
-    --texte-dim: #8F8D7A;
-    --bordure: rgba(231, 227, 211, 0.14);
-
-    --kaki: #8E9A62;
-    --kaki-fonce: #626D40;
-    --kaki-clair: #B9C48A;
-    --accent: #C8C58D;
-    --succes: #8FAE6B;
-    --erreur: #BF6F58;
-    --warning: #C99A55;
-
-    --rayon: 16px;
-    --ombre: none;
-    --verre-fond: rgba(26, 28, 20, 0.92);
-    --verre-bordure: rgba(231, 227, 211, 0.08);
-    --verre-flou: blur(10px);
-
-    /* Titres en serif discret, chiffres cles en Morhefa */
-    --police-titre: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
-    --police-chiffres: "Morhefa", system-ui, sans-serif;
-
-    --texte-h1: 26px;
-    --texte-h2: 20px;
-    --texte-label: 12px;
-}
 
 /* ---------- Fond : une seule teinte, tres douce ---------- */
 body::before {
@@ -2144,7 +2092,47 @@ select):focus,
 
 
 
-
-
 /* Graphique de progression : largeur plafonnee sur grand ecran */
 #prog-graphique { max-width: 26rem; margin: 0 auto; }
+
+/* ===========================================================
+   RANGS DE FORCE, NOTIFICATIONS, SAUVEGARDE, EN-TETE D'EXERCICE
+   =========================================================== */
+
+/* La barre de repos ne recouvre plus la fin de la liste */
+#page-seance:has(#barre-repos:not([hidden])) { padding-bottom: 13rem; }
+#barre-repos { padding: 0.55rem 0.9rem; }
+#barre-repos-temps { font-size: 2.1rem; }
+
+#rangs-force { list-style: none; padding: 0; margin: 0 0 1rem; }
+.rang-force-ligne { margin-bottom: 0.9rem; padding: 0.7rem 0.9rem; background: var(--surface); border-radius: 12px; }
+.rang-force-entete { display: flex; justify-content: space-between; align-items: baseline; gap: 0.5rem; margin-bottom: 0.4rem; }
+.rang-force-badge { font-family: var(--police-titre); font-weight: 700; white-space: nowrap; }
+.rang-force-ligne .aide-texte { margin: 0.4rem 0 0; }
+
+.option-ligne { display: flex; align-items: center; gap: 0.6rem; min-height: 3rem; font-size: 1rem; }
+.option-ligne input { width: 1.4rem; height: 1.4rem; }
+
+/* ===========================================================
+   MEDAILLE, DEFI DU JOUR, PHYSIQUE, VILLAGE, CALIBRATION
+   =========================================================== */
+#level-badge { display: inline-flex; align-items: center; gap: 0.45rem; }
+.medaille { flex-shrink: 0; display: block; }
+.rang-force-badge { display: inline-flex; align-items: center; gap: 0.35rem; }
+
+.defi { border-left: 3px solid var(--accent); }
+.defi h3 { margin: 0 0 0.2rem; }
+.defi p { margin: 0; }
+.defi.releve { border-left-color: var(--succes); }
+.defi.releve #defi-nom { text-decoration: line-through; opacity: 0.7; }
+
+#physique { padding: 0.5rem 0; }
+.physique-svg { display: block; width: 9rem; height: auto; margin: 0 auto; image-rendering: pixelated; }
+#physique-texte { text-align: center; }
+
+#village { margin: 0.5rem 0; }
+.village-svg { display: block; width: 100%; max-width: 26rem; height: auto; margin: 0 auto; }
+.village-cadenas { font-size: 14px; opacity: 0.5; }
+
+#calibration-liste { list-style: none; padding: 0; margin: 0 0 0.5rem; font-size: 0.9rem; }
+#calibration-liste li { margin-bottom: 0.4rem; }

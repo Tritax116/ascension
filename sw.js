@@ -1,4 +1,4 @@
-const CACHE = "ascension-v11";
+const CACHE = "ascension-v13";
 const FICHIERS = [
     "index.html",
     "style.css",
@@ -55,5 +55,18 @@ self.addEventListener("fetch", function(e){
             .catch(function(){
                 return caches.match(e.request);
             })
+    );
+});
+
+// Toucher la notification de repos ramene l'app au premier plan.
+self.addEventListener("notificationclick", function(e){
+    e.notification.close();
+    e.waitUntil(
+        self.clients.matchAll({ type: "window", includeUncontrolled: true }).then(function(liste){
+            for (let i = 0; i < liste.length; i++){
+                if ("focus" in liste[i]){ return liste[i].focus(); }
+            }
+            return self.clients.openWindow("./");
+        })
     );
 });

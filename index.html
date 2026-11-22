@@ -32,6 +32,10 @@
 
         <div id="page-accueil" class="page actif">
             <p id="message-coach"></p>
+            <div id="rappel-sauvegarde" class="prochaine-seance" hidden>
+                <span id="rappel-sauvegarde-texte" class="prochaine-texte"></span>
+                <button id="btn-sauvegarder-maintenant" class="btn-secondaire">Sauvegarder</button>
+            </div>
             <div id="prochaine-seance-accueil" class="prochaine-seance"></div>
 
             <div id="hero">
@@ -53,6 +57,14 @@
                 <p id="quete-timer"></p>
                 <p id="streak-alerte"></p>
                 <ul id="quete-objectifs"></ul>
+            </div>
+
+            <div id="defi-du-jour" class="prochaine-seance defi" hidden>
+                <div>
+                    <h3>⚡ Défi du jour</h3>
+                    <p id="defi-nom"></p>
+                </div>
+                <span id="defi-etat" class="prochaine-texte"></span>
             </div>
 
             <div id="hydratation">
@@ -264,11 +276,34 @@
                     <p id="fiche-classe"></p>
                     <p id="fiche-titre"></p>
 
+                    <h3>Rangs de force</h3>
+                    <p class="aide-texte">Estimés à partir de ton 1RM et de ton poids. Barème approximatif, seuls les exercices de la liste sont classés.</p>
+                    <ul id="rangs-force"></ul>
+
+                    <h3>Calibration</h3>
+                    <p id="calibration-info" class="aide-texte"></p>
+                    <ul id="calibration-liste"></ul>
+                    <button id="btn-calibrer" class="btn-secondaire" hidden>Appliquer mes rapports</button>
+                    <button id="btn-calibrer-reset" class="btn-tertiaire" hidden>Revenir aux valeurs par défaut</button>
+
+                    <h3>Ton physique</h3>
+                    <div id="physique"></div>
+                    <p id="physique-texte" class="aide-texte"></p>
+
+                    <h3>Ton village</h3>
+                    <div id="village"></div>
+                    <p id="village-texte" class="aide-texte"></p>
+
                     <h3>Programme</h3>
                     <p id="profil-programme" class="aide-texte"></p>
                     <button id="btn-onboarding" class="btn-secondaire">Modifier mon programme</button>
 
+                    <h3>Notifications</h3>
+                    <label class="option-ligne"><input type="checkbox" id="option-notifs"> Notifications de repos</label>
+                    <p id="notifs-etat" class="aide-texte"></p>
+
                     <h3>Données</h3>
+                    <p id="profil-sauvegarde" class="aide-texte"></p>
                     <p class="aide-texte">Télécharge une copie de toutes tes données (séances, XP, badges). À faire de temps en temps : ton historique ne vit que sur cet appareil.</p>
                     <button id="btn-export" class="btn-secondaire">Exporter mes données</button>
                     <button id="btn-import" class="btn-secondaire">Importer une sauvegarde</button>
