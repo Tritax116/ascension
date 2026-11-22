@@ -2136,3 +2136,5 @@ select):focus,
 
 #calibration-liste { list-style: none; padding: 0; margin: 0 0 0.5rem; font-size: 0.9rem; }
 #calibration-liste li { margin-bottom: 0.4rem; }
+
+.seance-exo-unite { font-family: var(--police-texte); font-size: 0.75rem; font-weight: 400; color: var(--texte-dim); }

@@ -149,45 +149,37 @@ const EXO_REFERENCE = {
     biceps: "curl-ez",
     triceps: "barre-au-front"
 };
-// Coefficient de charge : combien de fois la charge du mouvement de reference du muscle
-// on deplace sur cet exercice. Plus il est grand, plus il faut charger pour le meme rang.
-// Un exercice ABSENT de cette table n'est pas classe (aucun rang de force affiche).
+// Coefficient de charge, pour les exercices SANS bareme propre (voir STANDARDS_EXO) :
+// combien de fois la charge du mouvement de reference du muscle on deplace sur cet exercice.
+// Plus il est grand, plus il faut charger pour le meme rang. Un exercice ABSENT des deux tables
+// (STANDARDS_EXO et COEF_EXO) n'est pas classe. ATTENTION : un exercice present dans STANDARDS_EXO
+// ne doit PAS etre ici (son coefficient serait ignore).
+// Convention haltères : le poids saisi est celui d'UN haltère (comme dans le programme de Kylian).
 // Chiffres poses a vue de nez le 22/11/2026, a recalibrer avec mes propres donnees.
 const COEF_EXO = {
     // Quadriceps (reference : squat barre)
-    "squat-barre": 1,
     "hack-squat": 1.2,
-    "presse-cuisses": 2,
     "leg-extension": 0.5,
-    "bulgarian-squat": 0.3,
+    "bulgarian-squat": 0.3,          // par haltere
     // Ischios (reference : RDL)
-    "rdl": 1,
-    "souleve-terre": 1.2,
     "leg-curl-assis": 0.45,
     // Mollets
     "mollets-debout": 1,
     // Pectoraux (reference : developpe couche)
-    "developpe-couche": 1,
-    "developpe-incline": 0.85,
     "chest-press": 1,
     "pec-fly": 0.5,
     // Dorsaux (reference : rowing barre)
-    "rowing-barre": 1,
-    "pulldown-serre": 0.9,
     "rowing-cable": 0.9,
-    "rowing-haltere": 0.4,
+    "rowing-haltere": 0.4,           // par haltere
     // Trapezes
     "face-pull": 0.5,
-    // Epaules (reference : developpe militaire)
-    "developpe-militaire": 1,
-    "developpe-epaules": 0.9,
-    "elevations-lat": 0.15,
+    // Epaules (reference : developpe militaire barre)
+    "developpe-epaules": 0.4,        // par haltere : ~0,4 de la barre
+    "elevations-lat": 0.15,          // par haltere
     "rear-delt": 0.2,
     // Biceps (reference : curl barre EZ)
-    "curl-ez": 1,
-    "curl-marteau": 0.4,
+    "curl-marteau": 0.4,             // par haltere
     // Triceps (reference : barre au front)
-    "barre-au-front": 1,
     "pushdown": 1,
     "extension-nuque": 0.5
 };
@@ -2733,6 +2725,12 @@ function renderSeance() {
         const titre = document.createElement("div");
         titre.className = "seance-exo-nom";
         titre.textContent = exo.nom;
+        if (fiche && fiche.materiel === "halteres") {
+            const unite = document.createElement("span");
+            unite.className = "seance-exo-unite";
+            unite.textContent = " · kg par haltère";
+            titre.appendChild(unite);
+        }
 
         const btnSuppr = document.createElement("button");
         btnSuppr.className = "btn-suppr";
