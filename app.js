@@ -42,6 +42,8 @@ let minuteurFinRepos = null;
 let notifRepos = { exo: "", prochaine: "" };
 const NOTIF_TAG = "repos-ascension";
 const DIVISIONS_FORCE = ["III", "II", "I"];
+let cacheForceMuscle = null;
+const cacheBornes = new Map();
 
 // Defis du jour : pool pondere (poids = frequence). seance:true = propose les jours d'entrainement.
 const DEFIS = [
@@ -117,7 +119,19 @@ const STANDARDS_EXO = {
     "hip-thrust": [1.20, 1.86, 2.66, 3.56],
     "developpe-incline": [0.36, 0.49, 0.63, 0.78],   // par haltere
     "pulldown-serre": [0.80, 1.06, 1.35, 1.66],
-    "pulldown-large": [0.80, 1.06, 1.35, 1.66]
+    "pulldown-large": [0.80, 1.06, 1.35, 1.66],
+    "hack-squat": [1.28, 1.90, 2.66, 3.50],
+    "leg-extension": [0.90, 1.29, 1.75, 2.25],
+    "leg-curl-assis": [0.73, 1.04, 1.40, 1.80],
+    "rowing-cable": [0.81, 1.09, 1.40, 1.75],
+    "rowing-haltere": [0.38, 0.54, 0.74, 0.95],       // par haltere
+    "developpe-epaules": [0.28, 0.39, 0.53, 0.68],    // par haltere
+    "elevations-lat": [0.13, 0.20, 0.31, 0.43],       // par haltere
+    "curl-marteau": [0.20, 0.30, 0.41, 0.53],         // par haltere
+    "pushdown": [0.45, 0.70, 1.00, 1.34],
+    "pec-fly": [0.79, 1.11, 1.49, 1.90],
+    "chest-press": [0.76, 1.11, 1.54, 2.00],
+    "face-pull": [0.36, 0.59, 0.86, 1.19]
 };
 
 // Pour les autres exercices : seuils du mouvement de reference du muscle x coefficient (COEF_EXO).
@@ -151,37 +165,14 @@ const EXO_REFERENCE = {
 };
 // Coefficient de charge, pour les exercices SANS bareme propre (voir STANDARDS_EXO) :
 // combien de fois la charge du mouvement de reference du muscle on deplace sur cet exercice.
-// Plus il est grand, plus il faut charger pour le meme rang. Un exercice ABSENT des deux tables
-// (STANDARDS_EXO et COEF_EXO) n'est pas classe. ATTENTION : un exercice present dans STANDARDS_EXO
-// ne doit PAS etre ici (son coefficient serait ignore).
-// Convention haltères : le poids saisi est celui d'UN haltère (comme dans le programme de Kylian).
-// Chiffres poses a vue de nez le 22/11/2026, a recalibrer avec mes propres donnees.
+// Un exercice ABSENT des deux tables (STANDARDS_EXO et COEF_EXO) n'est pas classe : mieux vaut
+// aucun rang qu'un rang faux (rear delt et mollets debout n'ont volontairement aucun rang).
+// ATTENTION : un exercice present dans STANDARDS_EXO ne doit PAS etre ici (coefficient ignore).
+// Convention halteres : le poids saisi est celui d'UN haltere (comme dans le programme de Kylian).
+// Ces 2 chiffres sont des ESTIMATIONS (aucun bareme public lu) : a prendre avec prudence.
 const COEF_EXO = {
-    // Quadriceps (reference : squat barre)
-    "hack-squat": 1.2,
-    "leg-extension": 0.5,
-    "bulgarian-squat": 0.3,          // par haltere
-    // Ischios (reference : RDL)
-    "leg-curl-assis": 0.45,
-    // Mollets
-    "mollets-debout": 1,
-    // Pectoraux (reference : developpe couche)
-    "chest-press": 1,
-    "pec-fly": 0.5,
-    // Dorsaux (reference : rowing barre)
-    "rowing-cable": 0.9,
-    "rowing-haltere": 0.4,           // par haltere
-    // Trapezes
-    "face-pull": 0.5,
-    // Epaules (reference : developpe militaire barre)
-    "developpe-epaules": 0.4,        // par haltere : ~0,4 de la barre
-    "elevations-lat": 0.15,          // par haltere
-    "rear-delt": 0.2,
-    // Biceps (reference : curl barre EZ)
-    "curl-marteau": 0.4,             // par haltere
-    // Triceps (reference : barre au front)
-    "pushdown": 1,
-    "extension-nuque": 0.5
+    "bulgarian-squat": 0.3,          // par haltere (la page Strength Level parle d'une barre : non utilisee)
+    "extension-nuque": 0.5           // par haltere
 };
 
 
@@ -452,12 +443,11 @@ function nbSeancesAvec(idExo) {
     return n;
 }
 
+// Rapport MESURE entre un exercice et son mouvement de reference : affiche pour information,
+// jamais applique (l'appliquer effacerait tes points faibles : le rang deviendrait celui de la reference).
 function calibrationSuggeree() {
     const resultats = [];
     for (const id in COEF_EXO) {
-        if (STANDARDS_EXO[id]) {
-            continue;
-        }
         const ex = trouverExercice(id);
         const reference = ex ? EXO_REFERENCE[ex.muscle] : null;
         if (!reference || reference === id || nbSeancesAvec(id) < 3 || nbSeancesAvec(reference) < 3) {
@@ -468,7 +458,7 @@ function calibrationSuggeree() {
         if (!(rmExo > 0 && rmRef > 0)) {
             continue;
         }
-        resultats.push({ id: id, nom: ex.nom, reference: trouverExercice(reference).nom, defaut: COEF_EXO[id], mesure: Math.round(rmExo / rmRef * 100) / 100, actuel: coefExo(id) });
+        resultats.push({ id: id, nom: ex.nom, reference: trouverExercice(reference).nom, defaut: COEF_EXO[id], mesure: Math.round(rmExo / rmRef * 100) / 100 });
     }
     return resultats;
 }
@@ -480,30 +470,12 @@ function renderCalibration() {
     for (let i = 0; i < suggestions.length; i++) {
         const x = suggestions[i];
         const li = document.createElement("li");
-        li.textContent = x.nom + " : coefficient " + x.actuel + " (défaut " + x.defaut + ") → mesuré " + x.mesure + " par rapport à " + x.reference;
+        li.textContent = x.nom + " : ton rapport " + x.mesure + " par rapport à " + x.reference + " · coefficient utilisé " + x.defaut;
         liste.appendChild(li);
     }
-    document.getElementById("btn-calibrer").hidden = suggestions.length === 0;
-    const nbPerso = Object.keys(etat.coefsPerso).length;
-    document.getElementById("btn-calibrer-reset").hidden = nbPerso === 0;
     document.getElementById("calibration-info").textContent = suggestions.length === 0
-        ? "Pas encore assez de données : il faut au moins 3 séances avec l'exercice ET avec son mouvement de référence (squat, développé couché, rowing barre, curl EZ…)."
-        : "Ces rapports viennent de tes propres séances. Les appliquer aligne le rang de ces exercices sur celui de leur mouvement de référence.";
-}
-
-function appliquerCalibration() {
-    const suggestions = calibrationSuggeree();
-    for (let i = 0; i < suggestions.length; i++) {
-        etat.coefsPerso[suggestions[i].id] = suggestions[i].mesure;
-    }
-    save();
-    render();
-}
-
-function reinitialiserCalibration() {
-    etat.coefsPerso = {};
-    save();
-    render();
+        ? "Les exercices classés utilisent un barème public. Deux exercices (squat bulgare, extension nuque) ont un coefficient estimé, et quelques-uns (mollets debout, rear delt…) ne sont pas classés : ton rapport s'affichera ici après 3 séances avec l'exercice et son mouvement de référence."
+        : "Information seulement : ton rapport réel entre ces exercices et leur mouvement de référence. Il n'est pas appliqué, pour ne pas masquer tes points faibles.";
 }
 
 function formaterDate(dateStr) {
@@ -579,7 +551,6 @@ if (etat.poids === undefined) etat.poids = 70;
 if (!etat.seances) etat.seances = [];
 if (!etat.nutrition) etat.nutrition = { objectif: 2200, repas: [] };
 if (!etat.notesExos) etat.notesExos = {};
-if (!etat.coefsPerso) etat.coefsPerso = {};
 // La section Mobilite n'existe plus : on purge ses anciennes donnees.
 if (etat.mobilite) {
     delete etat.mobilite;
@@ -764,8 +735,6 @@ document.getElementById("btn-retour-profil").addEventListener("click", function 
     changerPage("accueil");
 });
 document.getElementById("btn-export").addEventListener("click", exporterDonnees);
-document.getElementById("btn-calibrer").addEventListener("click", appliquerCalibration);
-document.getElementById("btn-calibrer-reset").addEventListener("click", reinitialiserCalibration);
 document.getElementById("btn-sauvegarder-maintenant").addEventListener("click", exporterDonnees);
 document.getElementById("option-notifs").addEventListener("change", function (evenement) {
     etat.notifRepos = evenement.target.checked;
@@ -1325,9 +1294,11 @@ function couleurMuscle(nom) {
 
 function colorerMuscles() {
     const zones = document.querySelectorAll("[data-muscle]");
+    cacheForceMuscle = modeCarte === "force" ? calculerRangsForceMuscles() : null;
     for (let i = 0; i < zones.length; i++) {
         zones[i].style.fill = couleurMuscle(zones[i].dataset.muscle);
     }
+    cacheForceMuscle = null;
     const legende = document.getElementById("legende-muscles");
     legende.innerHTML = "";
     const entrees = LEGENDES_CARTE[modeCarte];
@@ -2189,12 +2160,15 @@ function meilleur1RM(idExo) {
 
 // Rang de force d'un exercice a partir d'un 1RM estime. null si non classable.
 // 15 bornes (5 rangs x 3 divisions) : chaque rang est coupe en 3 parts egales.
-// Coefficient utilise : celui calibre avec mes donnees s'il existe, sinon la valeur par defaut.
+// Coefficient d'un exercice sans bareme propre.
 function coefExo(idExo) {
-    return (etat.coefsPerso && etat.coefsPerso[idExo]) || COEF_EXO[idExo];
+    return COEF_EXO[idExo];
 }
 
 function bornesForce(seuils) {
+    if (cacheBornes.has(seuils)) {
+        return cacheBornes.get(seuils);
+    }
     const departs = [0].concat(seuils);
     const bornes = [];
     for (let k = 0; k < departs.length; k++) {
@@ -2204,6 +2178,7 @@ function bornesForce(seuils) {
             bornes.push(debut + (fin - debut) * d / 3);
         }
     }
+    cacheBornes.set(seuils, bornes);
     return bornes;
 }
 
@@ -2318,22 +2293,37 @@ function rangForce(idExo, rm) {
 
 // Meilleur rang de force atteint sur un muscle (tous exercices confondus).
 // Meilleur rang de force atteint sur un muscle (tous exercices classes confondus).
-function meilleurRangForceMuscle(muscle) {
-    let meilleur = null;
+// Un seul passage sur les seances : meilleur 1RM par exercice, puis meilleur rang par muscle.
+function calculerRangsForceMuscles() {
+    const meilleurs = {};
     for (let i = 0; i < etat.seances.length; i++) {
         const series = etat.seances[i].series;
         for (let j = 0; j < series.length; j++) {
             const x = series[j];
-            if (x.muscle !== muscle || !x.id) {
+            if (!x.id) {
                 continue;
             }
-            const rang = rangForce(x.id, estimer1RM(x.poids, x.reps));
-            if (rang && (!meilleur || rang.niveau > meilleur.niveau)) {
-                meilleur = rang;
+            const rm = estimer1RM(x.poids, x.reps);
+            if (!meilleurs[x.id] || rm > meilleurs[x.id].rm) {
+                meilleurs[x.id] = { rm: rm, muscle: x.muscle };
             }
         }
     }
-    return meilleur;
+    const parMuscle = {};
+    for (const id in meilleurs) {
+        const rang = rangForce(id, meilleurs[id].rm);
+        const muscle = meilleurs[id].muscle;
+        if (rang && (!parMuscle[muscle] || rang.niveau > parMuscle[muscle].niveau)) {
+            parMuscle[muscle] = rang;
+        }
+    }
+    return parMuscle;
+}
+
+// Meilleur rang de force atteint sur un muscle (tous exercices classes confondus).
+function meilleurRangForceMuscle(muscle) {
+    const parMuscle = cacheForceMuscle || calculerRangsForceMuscles();
+    return parMuscle[muscle] || null;
 }
 
 // Une serie qui vient d'etre validee fait-elle monter le rang de force de l'exercice ?

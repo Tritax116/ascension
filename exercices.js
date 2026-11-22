@@ -146,11 +146,17 @@ const NOMS_MATERIEL = {
 };
 
 // Retrouve un exercice par son id. Renvoie null si l'id est inconnu.
+let indexExercices = null;
+let tailleIndexExercices = 0;
+
 function trouverExercice(id) {
-    for (let i = 0; i < EXERCICES.length; i++) {
-        if (EXERCICES[i].id === id) {
-            return EXERCICES[i];
+    // L'index est reconstruit si le catalogue a change (exercice cree par Kylian).
+    if (!indexExercices || tailleIndexExercices !== EXERCICES.length) {
+        indexExercices = {};
+        for (let i = 0; i < EXERCICES.length; i++) {
+            indexExercices[EXERCICES[i].id] = EXERCICES[i];
         }
+        tailleIndexExercices = EXERCICES.length;
     }
-    return null;
+    return indexExercices[id] || null;
 }

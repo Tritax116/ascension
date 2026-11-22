@@ -1,4 +1,4 @@
-const CACHE = "ascension-v14";
+const CACHE = "ascension-v15";
 const FICHIERS = [
     "index.html",
     "style.css",
